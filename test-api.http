@@ -1,0 +1,159 @@
+### BookClubApp API Tests
+
+### 1. Health Check
+GET http://localhost:8080/health
+
+### 2. Server Info
+GET http://localhost:8080/
+
+### 3. Books API Tests
+
+#### Get all books
+GET http://localhost:8080/api/books
+
+#### Get book by ID
+GET http://localhost:8080/api/books/123
+
+#### Create new book
+POST http://localhost:8080/api/books
+Content-Type: application/json
+
+{
+  "title": "The Lord of the Rings",
+  "author": "J.R.R. Tolkien",
+  "genre": "Fantasy",
+  "year": 1954
+}
+
+#### Update book
+PUT http://localhost:8080/api/books/123
+Content-Type: application/json
+
+{
+  "title": "The Lord of the Rings - Special Edition",
+  "author": "J.R.R. Tolkien",
+  "genre": "Fantasy",
+  "year": 1954
+}
+
+#### Delete book
+DELETE http://localhost:8080/api/books/123
+
+### 4. Chapters API Tests
+
+#### Get all chapters of a book
+GET http://localhost:8080/api/books/123/chapters
+
+#### Get chapter by ID
+GET http://localhost:8080/api/books/123/chapters/456
+
+#### Create new chapter
+POST http://localhost:8080/api/books/123/chapters
+Content-Type: application/json
+
+{
+  "title": "A Long-expected Party",
+  "number": 1,
+  "content": "When Mr. Bilbo Baggins said..."
+}
+
+#### Update chapter
+PUT http://localhost:8080/api/books/123/chapters/456
+Content-Type: application/json
+
+{
+  "title": "A Long-expected Party - Revised",
+  "number": 1,
+  "content": "When Mr. Bilbo Baggins said..."
+}
+
+#### Delete chapter
+DELETE http://localhost:8080/api/books/123/chapters/456
+
+### 5. Comments API Tests
+
+#### Get all comments
+GET http://localhost:8080/api/comments
+
+#### Get comment by ID
+GET http://localhost:8080/api/comments/789
+
+#### Create new comment
+POST http://localhost:8080/api/comments
+Content-Type: application/json
+
+{
+  "userId": "user123",
+  "chapterId": "456",
+  "content": "Excellent chapter! Very well written.",
+  "rating": 5
+}
+
+#### Update comment
+PUT http://localhost:8080/api/comments/789
+Content-Type: application/json
+
+{
+  "userId": "user123",
+  "chapterId": "456",
+  "content": "Excellent chapter! Very well written. I highly recommend it.",
+  "rating": 5
+}
+
+#### Delete comment
+DELETE http://localhost:8080/api/comments/789
+
+#### Get comments by chapter
+GET http://localhost:8080/api/comments/chapter/456
+
+### 6. Users API Tests
+
+#### Get all users
+GET http://localhost:8080/api/users
+
+#### Get user by ID
+GET http://localhost:8080/api/users/456
+
+#### Create new user
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "name": "John Smith",
+  "email": "john@email.com",
+  "age": 25
+}
+
+#### Update user
+PUT http://localhost:8080/api/users/456
+Content-Type: application/json
+
+{
+  "name": "John Smith Johnson",
+  "email": "john.smith@email.com",
+  "age": 26
+}
+
+#### Delete user
+DELETE http://localhost:8080/api/users/456
+
+### 7. CORS Test (from browser console)
+```javascript
+// Test CORS from browser console
+fetch('http://localhost:8080/api/books')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+
+// Test chapters API
+fetch('http://localhost:8080/api/books/123/chapters')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+
+// Test comments API
+fetch('http://localhost:8080/api/comments')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+```
