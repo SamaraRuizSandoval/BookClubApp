@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  # Backend Go
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bookclubapp-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=:8080
+      - GIN_MODE=release
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - bookclubapp-network
+
+  # Frontend React (optional - for complete development)
+  frontend:
+    build:
+      context: ./book-club-app
+      dockerfile: Dockerfile
+    container_name: bookclubapp-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8080
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - bookclubapp-network
+    profiles:
+      - full-stack
+
+  # Redis for cache (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: bookclubapp-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - bookclubapp-network
+    profiles:
+      - cache
+
+  # PostgreSQL for database (optional)
+  postgres:
+    image: postgres:15-alpine
+    container_name: bookclubapp-postgres
+    environment:
+      POSTGRES_DB: bookclubapp
+      POSTGRES_USER: bookclub
+      POSTGRES_PASSWORD: bookclub123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - bookclubapp-network
+    profiles:
+      - database
+
+networks:
+  bookclubapp-network:
+    driver: bridge
+
+volumes:
+  redis_data:
+  postgres_data:
+
+# Useful commands:
+# 
+# Start only backend:
+# docker-compose up backend
+#
+# Start backend + frontend:
+# docker-compose --profile full-stack up
+#
+# Start with cache:
+# docker-compose --profile cache up
+#
+# Start with database:
+# docker-compose --profile database up
+#
+# Start everything:
+# docker-compose --profile full-stack --profile cache --profile database up
