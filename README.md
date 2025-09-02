@@ -33,4 +33,10 @@ cd backend
 go mod tidy
 go run main.go``
 
+By default, the backend will run on port 5000 but you can use the port flag to change the port. For example:
+`go run main.go -port 8081`
+
+You can verify that the backend is running by navigating to:
+http://localhost:5000/health
+
 
