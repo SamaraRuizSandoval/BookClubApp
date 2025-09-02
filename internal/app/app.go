@@ -23,5 +23,7 @@ func NewApplication() (*Application, error) {
 }
 
 func (a *Application) HealthCheck(ctx *gin.Context) {
-	ctx.String(http.StatusOK, "Status is available")
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "ok",
+	})
 }
