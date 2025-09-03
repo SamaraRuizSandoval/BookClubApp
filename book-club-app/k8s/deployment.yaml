@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookclub-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: bookclub-frontend }
+  template:
+    metadata:
+      labels: { app: bookclub-frontend }
+    spec:
+      containers:
+        - name: bookclub-frontend
+          image: bookclubregistry.azurecr.io/bookclub-frontend:${GIT_SHA}
+          ports:
+            - containerPort: 80
