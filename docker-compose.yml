@@ -2,12 +2,15 @@ services:
   db:
     container_name: BookClubAppDB
     image: postgres:17-alpine 
-    volumes:
-      - "./database/postgres-data:/var/lib/postgresql/data:rw"
     ports:
       - "5432:5432"
     environment:
       POSTGRES_DB: "postgres"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
+    volumes:
+      - pgdata:/var/lib/postgresql/17/data
     restart: unless-stopped
+    
+volumes:
+  pgdata:
