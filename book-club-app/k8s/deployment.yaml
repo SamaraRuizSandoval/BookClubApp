@@ -12,6 +12,6 @@ spec:
     spec:
       containers:
         - name: bookclub-frontend
-          image: bookclubregistry.azurecr.io/bookclub-frontend:${GIT_SHA}
+          image: bookclubregistry.azurecr.io/bookclub-frontend:{{GIT_SHA}}
           ports:
             - containerPort: 80
