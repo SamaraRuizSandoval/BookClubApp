@@ -74,7 +74,7 @@ jobs:
       - name: Deploy Kubernetes manifests
         run: |
           # ✅ Namespace applied to the stream from sed
-          sed "s|{{GIT_SHA}}|${IMAGE_TAG}|g" k8s/deployment.yaml \
+          sed "s|{{GIT_SHA}}|${IMAGE_TAG}|g" book-club-app/k8s/deployment.yaml \
             | kubectl apply -n "${{ vars.K8S_NAMESPACE }}" -f -
           kubectl apply -n "${{ vars.K8S_NAMESPACE }}" -f k8s/service.yaml
 
