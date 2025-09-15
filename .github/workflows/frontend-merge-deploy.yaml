@@ -1,88 +1,44 @@
-name: Frontend - Build & Deploy to AKS on main
+name: Frontend - Build & Deploy (SWA CLI)
 
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'book-club-app/**'
+      - '.github/workflows/frontend-merge-deploy.yml'
   workflow_dispatch:
 
-permissions:
-  id-token: write
-  contents: read
-
-env:
-  REGISTRY: ${{ vars.AZURE_CONTAINER_REGISTRY }}
-  IMAGE_NAME: bookclub-frontend
-  IMAGE_TAG: ${{ github.sha }}
+concurrency:
+  group: frontend-swa-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    env:
+      REACT_APP_API_BASE_URL: https://api.yourdomain.com
+      SWA_CLI_DEPLOYMENT_TOKEN: ${{ secrets.AZURE_SWA_TOKEN }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # If you’re using manual OIDC + az login (no Azure actions), keep these steps.
-      - name: Get GitHub OIDC token
-        id: oidc
-        run: |
-          TOKEN=$(curl -sS -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=api://AzureADTokenExchange" | jq -r '.value')
-          if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
-            echo "Failed to obtain OIDC token"; exit 1
-          fi
-          echo "token=$TOKEN" >> $GITHUB_OUTPUT
-
-      - name: Azure CLI login via OIDC
-        run: |
-          az login \
-            --service-principal \
-            -u "${{ vars.AZURE_CLIENT_ID }}" \
-            --tenant "${{ vars.AZURE_TENANT_ID }}" \
-            --federated-token "${{ steps.oidc.outputs.token }}"
-          az account set --subscription "${{ vars.AZURE_SUBSCRIPTION_ID }}"
-          az account show
-
-      - name: ACR login
-        run: az acr login --name "${{ vars.ACR_NAME }}"
-
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build & Push frontend image
-        uses: docker/build-push-action@v6
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          context: ./book-club-app
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          node-version: '20'
 
-      - name: Get AKS credentials
+      - name: Install deps
+        run: npm ci
+        working-directory: book-club-app
+
+      - name: Build
+        run: npm run build
+        working-directory: book-club-app
+
+      - name: Deploy with SWA CLI
         run: |
-          az aks get-credentials \
-            --resource-group "${{ vars.AKS_RESOURCE_GROUP }}" \
-            --name "${{ vars.AKS_CLUSTER_NAME }}" \
-            --overwrite-existing
-          kubectl config current-context
-          kubectl get nodes
-
-      - name: Ensure namespace
-        run: |
-          kubectl get ns "${{ vars.K8S_NAMESPACE }}" || kubectl create ns "${{ vars.K8S_NAMESPACE }}"
-
-      - name: Deploy Kubernetes manifests
-        run: |
-          # ✅ Namespace applied to the stream from sed
-          sed "s|{{GIT_SHA}}|${IMAGE_TAG}|g" book-club-app/k8s/deployment.yaml \
-            | kubectl apply -n "${{ vars.K8S_NAMESPACE }}" -f -
-          kubectl apply -n "${{ vars.K8S_NAMESPACE }}" -f book-club-app/k8s/service.yaml
-
-      - name: Wait for rollout
-        run: |
-          # ✅ Fixed truncation/quote so namespace interpolates correctly
-          kubectl rollout status deployment/bookclub-frontend \
-            -n "${{ vars.K8S_NAMESPACE }}" --timeout=240s
-
-      - name: Show service (public IP)
-        run: kubectl get svc bookclub-frontend -n "${{ vars.K8S_NAMESPACE }}" -o wide
+          npm i -g @azure/static-web-apps-cli
+          # replace with your SWA name and RG:
+          swa deploy ./build \
+            --app-name "bookclub-saw" \
+            --resource-group "bookclub-rg" \
+            --env production
+        working-directory: book-club-app
