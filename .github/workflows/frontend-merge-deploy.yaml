@@ -16,29 +16,40 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
+      # CRA: baked at build time; use this in code as process.env.REACT_APP_API_BASE_URL
       REACT_APP_API_BASE_URL: https://api.yourdomain.com
-      SWA_CLI_DEPLOYMENT_TOKEN: ${{ secrets.AZURE_SWA_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: book-club-app/package-lock.json
 
       - name: Install deps
         run: npm ci
         working-directory: book-club-app
 
-      - name: Build
+      - name: Build (CRA -> ./build)
         run: npm run build
         working-directory: book-club-app
+
+      - name: Ensure AZURE_SWA_TOKEN is set
+        run: |
+          if [ -z "${{ secrets.AZURE_SWA_TOKEN }}" ]; then
+            echo "::error::AZURE_SWA_TOKEN is not set. Go to your SWA resource → Overview → Manage deployment token, then add it as a repo secret.";
+            exit 1
+          fi
 
       - name: Deploy with SWA CLI
         run: |
           npm i -g @azure/static-web-apps-cli
-          # replace with your SWA name and RG:
           swa deploy ./build \
-            --app-name "bookclub-saw" \
+            --app-name "bookclub-swa" \
             --resource-group "bookclub-rg" \
-            --env production
+            --env production \
+            --deployment-token "${{ secrets.AZURE_SWA_TOKEN }}" \
+            --verbose=info
         working-directory: book-club-app
