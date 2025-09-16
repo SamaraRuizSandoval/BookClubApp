@@ -1,0 +1,4 @@
+# run lint-staged from frontend folder
+cd book-club-app
+npx lint-staged
+npm test
