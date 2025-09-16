@@ -87,6 +87,15 @@ func (pg *PostgresBookStore) AddBook(book *Book) (*Book, error) {
 		}
 	}
 
+	_, err = tx.Exec(`
+    INSERT INTO book_images (book_id, thumbnail_url, small_url, medium_url, large_url)
+    VALUES ($1, $2, $3, $4, $5)`,
+		bookID, book.Images.ThumbnailUrl, book.Images.SmallUrl, book.Images.MediumUrl,
+		book.Images.LargeUrl)
+	if err != nil {
+		return nil, err
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		return nil, err
