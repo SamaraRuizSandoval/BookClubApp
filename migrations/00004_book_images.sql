@@ -3,10 +3,10 @@
 CREATE TABLE IF NOT EXISTS book_images (
     id BIGSERIAL PRIMARY KEY, 
     book_id BIGINT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
-    thumbnail TEXT
-    small TEXT
-    medium TEXT
-    large TEXT
+    thumbnail_url TEXT,
+    small_url TEXT,
+    medium_url TEXT,
+    large_url TEXT
 );
 -- +goose StatementEnd
 

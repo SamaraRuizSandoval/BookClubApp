@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS book_authors (
     id BIGSERIAL PRIMARY KEY, 
     book_id BIGINT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
-    author_id BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+    author_id BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE
 );
 -- +goose StatementEnd
 
