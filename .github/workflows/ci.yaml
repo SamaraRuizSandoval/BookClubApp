@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+permissions:
+  contents: read
+
+env:
+  FRONTEND_DIR: book-club-app
+  BACKEND_DIR: internal
+  NODE_VERSION: "20"
+  GO_VERSION: "1.22"
+
+jobs:
+  frontend:
+    name: Frontend (format, lint, test, coverage)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.FRONTEND_DIR }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.FRONTEND_DIR }}/package-lock.json
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Prettier (format check)
+        run: npm run format
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Test + Coverage (Jest)
+        run: npm run test:coverage -- --watchAll=false
+        if: always()  # still collect coverage even if lint/format failed
+
+      - name: Upload coverage (frontend)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: |
+            ${{ env.FRONTEND_DIR }}/coverage
+          if-no-files-found: ignore
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## Frontend CI Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**ESLint:** see logs" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Coverage (lcov present?):**" >> $GITHUB_STEP_SUMMARY
+          test -f coverage/lcov.info && echo "lcov.info generated ✅" >> $GITHUB_STEP_SUMMARY || echo "no lcov.info ❌" >> $GITHUB_STEP_SUMMARY
+
+  backend:
+    name: Backend (format, lint, test, coverage)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.BACKEND_DIR }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Go mod download
+        run: go mod download
+
+      - name: Install gofumpt
+        run: go install mvdan.cc/gofumpt@latest
+
+      - name: Format check
+        id: fmt
+        run: |
+          CHANGES="$(gofumpt -l .)"
+          if [ -n "$CHANGES" ]; then
+            echo "Files not formatted:"
+            echo "$CHANGES"
+            echo "FORMAT_STATE=Needs fixes" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "FORMAT_STATE=OK" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.61.0
+          args: --timeout=5m
+
+      - name: Tests + Coverage
+        run: |
+          go test ./... -race -covermode=atomic -coverprofile=coverage.out
+          go tool cover -func=coverage.out | tail -n 1 | tee coverage-summary.txt
+
+      - name: Upload coverage (backend)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: |
+            ${{ env.BACKEND_DIR }}/coverage.out
+            ${{ env.BACKEND_DIR }}/coverage-summary.txt
+          if-no-files-found: warn
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## Backend CI Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Format:** ${{ steps.fmt.outputs.FORMAT_STATE || 'see logs' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Coverage:**" >> $GITHUB_STEP_SUMMARY
+          cat coverage-summary.txt >> $GITHUB_STEP_SUMMARY
+
+  ci-summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    needs: [frontend, backend]
+    steps:
+      - name: Summarize
+        run: echo "✅ Frontend & Backend checks completed."
