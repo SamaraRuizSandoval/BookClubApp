@@ -13,12 +13,17 @@ import (
 func main() {
 	var port int
 	flag.IntVar(&port, "port", 5000, "go backend server port")
-	flag.Parse() //Future note, use os.Getenv
+	flag.Parse() // Future note, use os.Getenv
 
 	app, err := app.NewApplication()
 	if err != nil {
 		panic(err)
 	}
+	defer func() {
+		if err := app.DB.Close(); err != nil {
+			app.Logger.Printf("failed to close DB: %v", err)
+		}
+	}()
 
 	r := routes.SetupRouter(app)
 	server := &http.Server{

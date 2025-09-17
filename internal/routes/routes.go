@@ -11,6 +11,8 @@ func SetupRouter(app *app.Application) *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/health", app.HealthCheck)
+	r.GET("/books/:id", app.BookHandler.HandleGetBookByID)
+	r.POST("/books", app.BookHandler.HandleAddBook)
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "route not found"})
 	})
