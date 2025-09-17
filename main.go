@@ -19,7 +19,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer app.DB.Close()
+	defer func() {
+		if err := app.DB.Close(); err != nil {
+			app.Logger.Printf("failed to close DB: %v", err)
+		}
+	}()
 
 	r := routes.SetupRouter(app)
 	server := &http.Server{

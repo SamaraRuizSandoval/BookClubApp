@@ -3,6 +3,7 @@ package store
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 )
@@ -47,7 +48,11 @@ func (pg *PostgresBookStore) AddBook(book *Book) (*Book, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
+			log.Printf("failed to rollback transaction: %v", err)
+		}
+	}()
 
 	var publisherID int
 	err = tx.QueryRow(`
