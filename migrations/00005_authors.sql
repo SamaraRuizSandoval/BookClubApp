@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS authors (
     id BIGSERIAL PRIMARY KEY, 
-    name VARCHAR(150) NOT NULL
+    name VARCHAR(150) NOT NULL UNIQUE
 );
 -- +goose StatementEnd
 

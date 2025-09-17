@@ -2,19 +2,23 @@ package store
 
 import (
 	"database/sql"
+	"fmt"
+	"strings"
 	"time"
 )
+
+type JSONDate time.Time
 
 type Book struct {
 	ID            int        `json:"id"`
 	Title         string     `json:"title"`
 	Authors       []string   `json:"authors"`
 	Publisher     string     `json:"publisher"`
-	PublishedDate time.Time  `json:"published_date"`
+	PublishedDate JSONDate   `json:"published_date"`
 	Description   *string    `json:"description"`
 	PageCount     *int       `json:"page_count"`
-	Isbn13        string     `json:"isbn_13"`
-	Isbn10        *string    `json:"isbn_10"`
+	ISBN13        string     `json:"isbn_13"`
+	ISBN10        *string    `json:"isbn_10"`
 	Images        BookImages `json:"book_images"`
 }
 
@@ -62,11 +66,12 @@ func (pg *PostgresBookStore) AddBook(book *Book) (*Book, error) {
         INSERT INTO books (title, publisher_id, published_date, description, page_count, isbn_13, isbn_10) 
         VALUES ($1,$2,$3,$4,$5,$6,$7) 
         RETURNING id`,
-		book.Title, publisherID, book.PublishedDate, book.Description, book.PageCount, book.Isbn13, book.Isbn10,
+		book.Title, publisherID, book.PublishedDate.ToTime(), book.Description, book.PageCount, book.ISBN13, book.ISBN10,
 	).Scan(&bookID)
 	if err != nil {
 		return nil, err
 	}
+	book.ID = bookID
 
 	for _, author := range book.Authors {
 		var authorID int
@@ -107,4 +112,25 @@ func (pg *PostgresBookStore) AddBook(book *Book) (*Book, error) {
 func (pg *PostgresBookStore) GetBookByID(id int64) (*Book, error) {
 	book := &Book{}
 	return book, nil
+}
+
+func (d *JSONDate) UnmarshalJSON(b []byte) error {
+	s := strings.Trim(string(b), `"`)
+	if s == "" {
+		return nil
+	}
+	t, err := time.Parse("2006-01-02", s)
+	if err != nil {
+		return err
+	}
+	*d = JSONDate(t)
+	return nil
+}
+
+func (d JSONDate) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`"%s"`, time.Time(d).Format("2006-01-02"))), nil
+}
+
+func (d JSONDate) ToTime() time.Time {
+	return time.Time(d)
 }

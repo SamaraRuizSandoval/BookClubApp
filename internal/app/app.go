@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/SamaraRuizSandoval/BookClubApp/internal/api"
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/store"
 	"github.com/SamaraRuizSandoval/BookClubApp/migrations"
 	"github.com/gin-gonic/gin"
@@ -13,8 +14,9 @@ import (
 
 // Resourses that we can use through our application
 type Application struct {
-	Logger *log.Logger
-	DB     *sql.DB
+	Logger      *log.Logger
+	DB          *sql.DB
+	BookHandler *api.BookHandler
 }
 
 func NewApplication() (*Application, error) {
@@ -28,10 +30,15 @@ func NewApplication() (*Application, error) {
 		panic(err)
 	}
 
+	bookStore := store.NewPostgresBookStore(pgDB)
+
+	bookHandler := api.NewBookHandler(bookStore)
+
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 	app := &Application{
-		Logger: logger,
-		DB:     pgDB,
+		Logger:      logger,
+		DB:          pgDB,
+		BookHandler: bookHandler,
 	}
 
 	return app, nil
