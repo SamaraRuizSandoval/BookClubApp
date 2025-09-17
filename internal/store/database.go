@@ -10,7 +10,7 @@ import (
 )
 
 func Open() (*sql.DB, error) {
-	//Connection to the DB using pgx as the driver
+	// Connection to the DB using pgx as the driver
 	db, err := sql.Open("pgx", "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable")
 	if err != nil {
 		return nil, fmt.Errorf("db: open %w", err)
