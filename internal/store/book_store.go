@@ -43,14 +43,15 @@ type BookStore interface {
 	GetBookByID(id int64) (*Book, error)
 }
 
-func (pg *PostgresBookStore) AddBook(book *Book) (*Book, error) {
+func (pg *PostgresBookStore) AddBook(book *Book) (_ *Book, err error) {
 	tx, err := pg.db.Begin()
 	if err != nil {
 		return nil, err
 	}
 	defer func() {
-		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
-			log.Printf("failed to rollback transaction: %v", err)
+		// Rollback will be a no-op if the tx is already committed.
+		if rbErr := tx.Rollback(); rbErr != nil && rbErr != sql.ErrTxDone {
+			log.Printf("failed to rollback transaction: %v", rbErr)
 		}
 	}()
 
