@@ -39,4 +39,42 @@ By default, the backend will run on port 5000 but you can use the port flag to c
 You can verify that the backend is running by navigating to:
 http://localhost:5000/health
 
+### 3. Building for Web
+To create a production-ready web build of the frontend:
 
+``bash
+cd book-club-app
+npm run build
+``
+
+### Running as a Mobile App (Capacitor)
+The frontend can be packaged as an iOS/Android app using Capacitor.
+
+``bash
+# from project root
+npm install @capacitor/core @capacitor/cli
+npx cap init "BookClub" com.app.bookclub
+
+# Add platforms
+npx cap add ios
+npx cap add android
+``
+
+Make sure capacitor.config.json has "webDir": "build".
+
+Building & syncing
+Whenever you change the frontend:
+
+``bash
+cd book-club-app
+npm run build      # rebuild frontend
+npx cap copy       # copy build into native projects
+``
+
+Opening native projects
+``bash
+npx cap open ios     # opens in Xcode (Mac only)
+npx cap open android # opens in Android Studio
+``
+
+From there you can run on simulators or devices.
