@@ -1,37 +1,5 @@
 package api
 
-// import (
-// 	"github.com/SamaraRuizSandoval/BookClubApp/internal/routes"
-// 	"github.com/gin-gonic/gin"
-// )
-
-// func setupRouter() *gin.Engine {
-//   router := gin.Default()
-//   router.GET("/ping", func(c *gin.Context) {
-//     c.String(200, "pong")
-//   })
-//   return router
-// }
-
-// func postUser(router *gin.Engine) *gin.Engine {
-//   router.POST("/user/add", func(c *gin.Context) {
-//     var user User
-//     c.BindJSON(&user)
-//     c.JSON(200, user)
-//   })
-//   return router
-// }
-
-// func main() {
-//   router := setupRouter()
-//   router = postUser(r)
-//   router.Run(":8080")
-// }
-
-// //Test for code example above:
-
-// package main
-
 import (
 	"bytes"
 	"encoding/json"

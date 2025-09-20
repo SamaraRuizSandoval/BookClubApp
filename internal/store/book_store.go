@@ -21,6 +21,7 @@ type Book struct {
 	ISBN13        string     `json:"isbn_13"`
 	ISBN10        *string    `json:"isbn_10"`
 	Images        BookImages `json:"book_images"`
+	Chapters      []Chapter  `json:"chapters"`
 }
 
 type BookImages struct {
@@ -28,6 +29,11 @@ type BookImages struct {
 	SmallUrl     *string `json:"small_url"`
 	MediumUrl    *string `json:"medium_url"`
 	LargeUrl     *string `json:"large_url"`
+}
+
+type Chapter struct {
+	Number int    `json:"number"`
+	Title  string `json:"title"`
 }
 
 type PostgresBookStore struct {
@@ -41,6 +47,7 @@ func NewPostgresBookStore(db *sql.DB) *PostgresBookStore {
 type BookStore interface {
 	AddBook(*Book) (*Book, error)
 	GetBookByID(id int64) (*Book, error)
+	UpdateBook(*Book) error
 }
 
 func (pg *PostgresBookStore) AddBook(book *Book) (_ *Book, err error) {
@@ -107,6 +114,17 @@ func (pg *PostgresBookStore) AddBook(book *Book) (_ *Book, err error) {
 		return nil, err
 	}
 
+	for _, ch := range book.Chapters {
+		_, err := tx.Exec(`
+			INSERT INTO chapters (book_id, number, title) 
+			VALUES ($1, $2, $3)`,
+			bookID, ch.Number, ch.Title,
+		)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		return nil, err
@@ -117,7 +135,90 @@ func (pg *PostgresBookStore) AddBook(book *Book) (_ *Book, err error) {
 
 func (pg *PostgresBookStore) GetBookByID(id int64) (*Book, error) {
 	book := &Book{}
+
+	err := pg.db.QueryRow(`
+        SELECT b.id, b.title, b.published_date, b.description, b.page_count, b.isbn_13, b.isbn_10, p.name
+        FROM books b
+        JOIN publishers p ON b.publisher_id = p.id
+        WHERE b.id = $1`, id).Scan(
+		&book.ID,
+		&book.Title,
+		&book.PublishedDate,
+		&book.Description,
+		&book.PageCount,
+		&book.ISBN13,
+		&book.ISBN10,
+		&book.Publisher,
+	)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := pg.db.Query(`
+        SELECT a.name
+        FROM authors a
+        JOIN book_authors ba ON a.id = ba.author_id
+        WHERE ba.book_id = $1
+    `, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var authors []string
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+		authors = append(authors, name)
+	}
+	book.Authors = authors
+
+	var images BookImages
+	err = pg.db.QueryRow(`
+        SELECT thumbnail_url, small_url, medium_url, large_url
+        FROM book_images
+        WHERE book_id = $1
+	`, id).Scan(&images.ThumbnailUrl, &images.SmallUrl, &images.MediumUrl, &images.LargeUrl)
+
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
+	}
+
+	chapterRows, err := pg.db.Query(`
+        SELECT number, title
+        FROM chapters
+        WHERE book_id = $1
+        ORDER BY number
+    `, id)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
+	}
+	defer chapterRows.Close()
+
+	var chapters []Chapter
+	for chapterRows.Next() {
+		var ch Chapter
+		if err := chapterRows.Scan(&ch.Number, &ch.Title); err != nil {
+			return nil, err
+		}
+		chapters = append(chapters, ch)
+	}
+	book.Chapters = chapters
+
 	return book, nil
+}
+
+func (pg *PostgresBookStore) UpdateBook(book *Book) error {
+	return nil
 }
 
 func (d *JSONDate) UnmarshalJSON(b []byte) error {

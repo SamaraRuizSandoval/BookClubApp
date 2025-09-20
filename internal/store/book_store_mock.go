@@ -15,3 +15,8 @@ func (m *MockBookStore) GetBookByID(id int64) (*Book, error) {
 	args := m.Called(id)
 	return args.Get(0).(*Book), args.Error(1)
 }
+
+func (m *MockBookStore) UpdateBook(book *Book) error {
+	//TODO
+	return nil
+}
