@@ -47,7 +47,7 @@ func NewPostgresBookStore(db *sql.DB) *PostgresBookStore {
 type BookStore interface {
 	AddBook(*Book) (*Book, error)
 	GetBookByID(id int64) (*Book, error)
-	UpdateBook(*Book) error
+	UpdateBook(book *Book) error
 }
 
 func (pg *PostgresBookStore) AddBook(book *Book) (_ *Book, err error) {
@@ -166,7 +166,11 @@ func (pg *PostgresBookStore) GetBookByID(id int64) (*Book, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		if closeErr := rows.Close(); closeErr != nil {
+			log.Printf("failed to close transaction: %v", closeErr)
+		}
+	}()
 
 	var authors []string
 	for rows.Next() {
@@ -184,7 +188,6 @@ func (pg *PostgresBookStore) GetBookByID(id int64) (*Book, error) {
         FROM book_images
         WHERE book_id = $1
 	`, id).Scan(&images.ThumbnailUrl, &images.SmallUrl, &images.MediumUrl, &images.LargeUrl)
-
 	if err != nil {
 		if err != sql.ErrNoRows {
 			return nil, err
@@ -202,7 +205,11 @@ func (pg *PostgresBookStore) GetBookByID(id int64) (*Book, error) {
 			return nil, err
 		}
 	}
-	defer chapterRows.Close()
+	defer func() {
+		if closeErr := chapterRows.Close(); closeErr != nil {
+			log.Printf("failed to close transaction: %v", closeErr)
+		}
+	}()
 
 	var chapters []Chapter
 	for chapterRows.Next() {
@@ -218,6 +225,118 @@ func (pg *PostgresBookStore) GetBookByID(id int64) (*Book, error) {
 }
 
 func (pg *PostgresBookStore) UpdateBook(book *Book) error {
+	tx, err := pg.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if rbErr := tx.Rollback(); rbErr != nil && rbErr != sql.ErrTxDone {
+			log.Printf("failed to rollback update transaction: %v", rbErr)
+		}
+	}()
+
+	if err := updateBookCore(tx, book); err != nil {
+		return fmt.Errorf("failed to update core: %w", err)
+	}
+
+	if err := updateBookAuthors(tx, book.ID, book.Authors); err != nil {
+		return fmt.Errorf("failed to update book's authors: %w", err)
+	}
+
+	if err := updateBookImages(tx, book.ID, book.Images); err != nil {
+		return fmt.Errorf("failed to update book's images: %w", err)
+	}
+
+	if err := updateBookChapters(tx, book.ID, book.Chapters); err != nil {
+		return fmt.Errorf("failed to update book's chapters: %w", err)
+	}
+
+	return tx.Commit()
+}
+
+func updateBookCore(tx *sql.Tx, book *Book) error {
+	var publisherID int
+	err := tx.QueryRow(`
+        INSERT INTO publishers (name)
+        VALUES ($1)
+        ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name
+        RETURNING id`,
+		book.Publisher,
+	).Scan(&publisherID)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(`
+        UPDATE books
+        SET title = $1, publisher_id = $2, published_date = $3,
+            description = $4, page_count = $5, isbn_13 = $6, isbn_10 = $7
+        WHERE id = $8`,
+		book.Title, publisherID, book.PublishedDate, book.Description,
+		book.PageCount, book.ISBN13, book.ISBN10, book.ID,
+	)
+	return err
+}
+
+func updateBookAuthors(tx *sql.Tx, bookID int, authors []string) error {
+	_, err := tx.Exec(`DELETE FROM book_authors WHERE book_id = $1`, bookID)
+	if err != nil {
+		return err
+	}
+
+	for _, author := range authors {
+		var authorID int
+		err = tx.QueryRow(`
+            INSERT INTO authors (name)
+            VALUES ($1)
+            ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name
+            RETURNING id`, author,
+		).Scan(&authorID)
+		if err != nil {
+			return err
+		}
+
+		_, err = tx.Exec(
+			`INSERT INTO book_authors (book_id, author_id) VALUES ($1,$2)`,
+			bookID, authorID,
+		)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func updateBookImages(tx *sql.Tx, bookID int, images BookImages) error {
+	_, err := tx.Exec(`
+        INSERT INTO book_images (book_id, thumbnail_url, small_url, medium_url, large_url)
+        VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT (book_id) DO UPDATE
+        SET thumbnail_url = EXCLUDED.thumbnail_url,
+            small_url = EXCLUDED.small_url,
+            medium_url = EXCLUDED.medium_url,
+            large_url = EXCLUDED.large_url`,
+		bookID, images.ThumbnailUrl, images.SmallUrl, images.MediumUrl, images.LargeUrl,
+	)
+	return err
+}
+
+func updateBookChapters(tx *sql.Tx, bookID int, chapters []Chapter) error {
+	_, err := tx.Exec(`DELETE FROM chapters WHERE book_id = $1`, bookID)
+	if err != nil {
+		return err
+	}
+
+	for _, ch := range chapters {
+		_, err = tx.Exec(`
+            INSERT INTO chapters (book_id, number, title)
+            VALUES ($1, $2, $3)`,
+			bookID, ch.Number, ch.Title,
+		)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
