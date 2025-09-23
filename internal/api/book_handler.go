@@ -126,6 +126,9 @@ func (bh *BookHandler) HandleDeleteBookByID(ctx *gin.Context) {
 		if errors.Is(err, sql.ErrNoRows) {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": "book not found"})
 			return
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete book"})
+			return
 		}
 	}
 

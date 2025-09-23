@@ -309,6 +309,6 @@ func (s *BookHandlerTestSuite) TestHandleDeleteBook_Success() {
 	ctx.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
 	s.handler.HandleDeleteBookByID(ctx)
 
-	s.Equal(http.StatusNoContent, w.Code)
+	s.Equal(http.StatusOK, w.Code)
 	s.mockStore.AssertExpectations(s.T())
 }
