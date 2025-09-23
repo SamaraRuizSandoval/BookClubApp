@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS books (
     id BIGSERIAL PRIMARY KEY, 
     title VARCHAR(150) NOT NULL,
-    publisher_id BIGINT NOT NULL REFERENCES publishers(id) ON DELETE CASCADE,
+    publisher_id BIGINT NOT NULL REFERENCES publishers(id) ON DELETE RESTRICT,
     published_date DATE NOT NULL,
     description TEXT, 
     page_count INT,

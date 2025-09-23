@@ -173,7 +173,7 @@ func (s *BookHandlerTestSuite) TestUpdateBookByID_InvalidRequest() {
 	s.Equal(http.StatusBadRequest, w.Code)
 }
 
-func (s *BookHandlerTestSuite) TestHandleUpdateBook_InvalidID_ParseError() {
+func (s *BookHandlerTestSuite) TestHandleUpdateBook_InvalidID() {
 	req, _ := http.NewRequest(http.MethodPut, "/books/abc", nil)
 	w := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(w)
@@ -250,5 +250,65 @@ func (s *BookHandlerTestSuite) TestHandleUpdateBook_ErrorUpdatingBook() {
 	s.handler.HandleUpdateBookByID(ctx)
 
 	s.Equal(http.StatusInternalServerError, w.Code)
+	s.mockStore.AssertExpectations(s.T())
+}
+
+func (s *BookHandlerTestSuite) TestDeleteBookByID_InvalidRequest() {
+	req, _ := http.NewRequest(http.MethodDelete, "/book/abc", nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	ctx.Request = req
+
+	s.handler.HandleDeleteBookByID(ctx)
+
+	s.Equal(http.StatusBadRequest, w.Code)
+}
+
+func (s *BookHandlerTestSuite) TestHandleDeleteBook_InvalidID() {
+	req, _ := http.NewRequest(http.MethodDelete, "/book/abc", nil)
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	ctx.Request = req
+
+	ctx.Params = gin.Params{gin.Param{Key: "id", Value: "abc"}}
+
+	s.handler.HandleDeleteBookByID(ctx)
+
+	s.Equal(http.StatusBadRequest, w.Code)
+}
+
+func (s *BookHandlerTestSuite) TestHandleDeleteBook_ErrorBookNotFound() {
+	s.mockStore.On("DeleteBookByID", mock.Anything).Return(fmt.Errorf("no rows in result set"))
+
+	req, _ := http.NewRequest(http.MethodDelete, "/books/1", nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	ctx.Request = req
+
+	ctx.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+	s.handler.HandleDeleteBookByID(ctx)
+
+	s.Equal(http.StatusInternalServerError, w.Code)
+	s.mockStore.AssertExpectations(s.T())
+}
+
+func (s *BookHandlerTestSuite) TestHandleDeleteBook_Success() {
+	s.mockStore.On("DeleteBookByID", mock.Anything).Return(nil)
+
+	req, _ := http.NewRequest(http.MethodDelete, "/books/1", nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	ctx.Request = req
+
+	ctx.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+	s.handler.HandleDeleteBookByID(ctx)
+
+	s.Equal(http.StatusNoContent, w.Code)
 	s.mockStore.AssertExpectations(s.T())
 }

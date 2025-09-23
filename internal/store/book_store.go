@@ -48,6 +48,7 @@ type BookStore interface {
 	AddBook(*Book) (*Book, error)
 	GetBookByID(id int64) (*Book, error)
 	UpdateBook(book *Book) error
+	DeleteBookByID(id int64) error
 }
 
 func (pg *PostgresBookStore) AddBook(book *Book) (_ *Book, err error) {
@@ -56,7 +57,6 @@ func (pg *PostgresBookStore) AddBook(book *Book) (_ *Book, err error) {
 		return nil, err
 	}
 	defer func() {
-		// Rollback will be a no-op if the tx is already committed.
 		if rbErr := tx.Rollback(); rbErr != nil && rbErr != sql.ErrTxDone {
 			log.Printf("failed to rollback transaction: %v", rbErr)
 		}
@@ -337,6 +337,37 @@ func updateBookChapters(tx *sql.Tx, bookID int, chapters []Chapter) error {
 			return err
 		}
 	}
+	return nil
+}
+
+func (pg *PostgresBookStore) DeleteBookByID(id int64) error {
+	tx, err := pg.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if rbErr := tx.Rollback(); rbErr != nil && rbErr != sql.ErrTxDone {
+			log.Printf("failed to rollback transaction: %v", rbErr)
+		}
+	}()
+
+	res, err := tx.Exec(`DELETE FROM books WHERE id = $1`, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete book: %w", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check deleted rows: %w", err)
+	}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit delete: %w", err)
+	}
+
 	return nil
 }
 

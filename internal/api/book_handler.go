@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
 	"strconv"
 
@@ -105,4 +106,30 @@ func (bh *BookHandler) HandleUpdateBookByID(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, updatedBook)
+}
+
+func (bh *BookHandler) HandleDeleteBookByID(ctx *gin.Context) {
+	paramsBookId := ctx.Param("id")
+	if paramsBookId == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+
+	bookID, err := strconv.ParseInt(paramsBookId, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+
+	err = bh.bookStore.DeleteBookByID(bookID)
+	if err == sql.ErrNoRows {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "book not found"})
+		return
+	}
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete book"})
+		return
+	}
+
+	ctx.JSON(http.StatusNoContent, "")
 }
