@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS book_images (
     id BIGSERIAL PRIMARY KEY, 
-    book_id BIGINT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+    book_id BIGINT NOT NULL UNIQUE REFERENCES books(id) ON DELETE CASCADE,
     thumbnail_url TEXT,
     small_url TEXT,
     medium_url TEXT,

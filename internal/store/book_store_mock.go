@@ -13,5 +13,18 @@ func (m *MockBookStore) AddBook(book *Book) (*Book, error) {
 
 func (m *MockBookStore) GetBookByID(id int64) (*Book, error) {
 	args := m.Called(id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
 	return args.Get(0).(*Book), args.Error(1)
+}
+
+func (m *MockBookStore) UpdateBook(book *Book) error {
+	args := m.Called(book)
+	return args.Error(0)
+}
+
+func (m *MockBookStore) DeleteBookByID(id int64) error {
+	args := m.Called(id)
+	return args.Error(0)
 }
