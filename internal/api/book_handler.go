@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -122,14 +123,12 @@ func (bh *BookHandler) HandleDeleteBookByID(ctx *gin.Context) {
 	}
 
 	err = bh.bookStore.DeleteBookByID(bookID)
-	if err == sql.ErrNoRows {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": "book not found"})
-		return
-	}
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete book"})
-		return
+	if err := bh.bookStore.DeleteBookByID(bookID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "book not found"})
+			return
+		}
 	}
 
-	ctx.JSON(http.StatusNoContent, "")
+	ctx.Status(http.StatusNoContent)
 }

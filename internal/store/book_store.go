@@ -2,6 +2,7 @@ package store
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -188,11 +189,10 @@ func (pg *PostgresBookStore) GetBookByID(id int64) (*Book, error) {
         FROM book_images
         WHERE book_id = $1
 	`, id).Scan(&images.ThumbnailUrl, &images.SmallUrl, &images.MediumUrl, &images.LargeUrl)
-	if err != nil {
-		if err != sql.ErrNoRows {
-			return nil, err
-		}
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
 	}
+	book.Images = images
 
 	chapterRows, err := pg.db.Query(`
         SELECT number, title
