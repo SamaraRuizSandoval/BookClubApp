@@ -1,5 +1,4 @@
 # run lint-staged from frontend folder
 cd book-club-app
-npm install husky --save-dev
 npx lint-staged
 npm test
