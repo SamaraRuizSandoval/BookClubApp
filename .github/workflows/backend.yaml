@@ -43,7 +43,7 @@ jobs:
         run: npm run lint
 
       - name: Test + Coverage (Jest)
-        run: npm run test:coverage -- --watchAll=false
+        run: npm run test:coverage -- --watch=false
         if: always()  # still collect coverage even if lint/format failed
 
       - name: Upload coverage (frontend)
