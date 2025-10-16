@@ -16,8 +16,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      # CRA: baked at build time; use this in code as process.env.REACT_APP_API_BASE_URL
-      REACT_APP_API_BASE_URL: https://api.yourdomain.com
+      # Vite: baked at build time; read with import.meta.env.VITE_API_BASE_URL
+      VITE_API_BASE_URL: https://api.yourdomain.com
 
     steps:
       - uses: actions/checkout@v4
@@ -32,21 +32,21 @@ jobs:
         run: npm ci
         working-directory: book-club-app
 
-      - name: Build (CRA -> ./build)
+      - name: Build (Vite -> ./dist)
         run: npm run build
         working-directory: book-club-app
 
       - name: Ensure AZURE_SWA_TOKEN is set
         run: |
           if [ -z "${{ secrets.AZURE_SWA_TOKEN }}" ]; then
-            echo "::error::AZURE_SWA_TOKEN is not set. Go to your SWA resource → Overview → Manage deployment token, then add it as a repo secret.";
+            echo "::error::AZURE_SWA_TOKEN is not set. In your SWA resource: Overview → Manage deployment token → add as repo secret.";
             exit 1
           fi
 
       - name: Deploy with SWA CLI
         run: |
           npm i -g @azure/static-web-apps-cli
-          swa deploy ./build \
+          swa deploy ./dist \
             --app-name "bookclub-swa" \
             --resource-group "bookclub-rg" \
             --env production \
