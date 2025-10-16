@@ -6,7 +6,7 @@ if (!window.matchMedia) {
   // Vitest + JSDOM don’t implement matchMedia by default.
   // This keeps IonSplitPane from throwing during tests.
   // You can extend this if you need more behavior.
-   
+
   window.matchMedia = ((query: string): any => {
     return {
       matches: false,
@@ -24,7 +24,6 @@ if (!window.matchMedia) {
 // Some Ionic components also touch ResizeObserver in certain layouts.
 // Safe no-op mock to avoid surprises later.
 if (!('ResizeObserver' in window)) {
-   
   (window as any).ResizeObserver = class {
     observe() {}
     unobserve() {}
