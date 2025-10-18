@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -22,7 +23,10 @@ type BookHandlerTestSuite struct {
 
 func (s *BookHandlerTestSuite) SetupTest() {
 	s.mockStore = new(store.MockBookStore)
-	s.handler = NewBookHandler(s.mockStore)
+	var buf bytes.Buffer
+	logger := log.New(&buf, "TEST: ", log.Ldate|log.Ltime|log.Lshortfile)
+
+	s.handler = NewBookHandler(s.mockStore, logger)
 }
 
 func TestBookHandlerTestSuite(t *testing.T) {
