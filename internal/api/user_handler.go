@@ -100,7 +100,7 @@ func (uh *UserHandler) HandleRegisterUser(ctx *gin.Context) {
 	err = user.PasswordHash.Set(req.Password)
 	if err != nil {
 		uh.logger.Printf("ERROR: hasing password %v", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "invalid credentials"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 

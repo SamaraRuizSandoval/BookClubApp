@@ -39,9 +39,14 @@ func (th *TokenHandler) HandleCreateToken(ctx *gin.Context) {
 	}
 
 	user, err := th.userStore.GetUserByUsername(req.Username)
-	if err != nil || user == nil {
+	if err != nil {
 		th.logger.Printf("ERROR: GetUserByUsername %v", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	if user == nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
 
