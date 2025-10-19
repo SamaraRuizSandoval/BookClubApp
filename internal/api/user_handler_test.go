@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -100,6 +101,87 @@ func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_MissingPassword() {
 
 	uhs.Equal(http.StatusBadRequest, rec.Code)
 	uhs.Contains(rec.Body.String(), "password is required")
+}
+
+func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_UsernameTaken() {
+	rec := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(rec)
+
+	reqBody := map[string]string{
+		"username": "john",
+		"email":    "john@example.com",
+		"password": "strong-password",
+	}
+	b, _ := json.Marshal(reqBody)
+	ctx.Request = httptest.NewRequest(http.MethodPost, "/register", bytes.NewReader(b))
+	ctx.Request.Header.Set("Content-Type", "application/json")
+
+	expectedUser := &store.User{}
+
+	uhs.mockUserStore.
+		On("CreateUser", mock.MatchedBy(func(u *store.User) bool {
+			return u != nil && u.Username == "john" && u.Email == "john@example.com"
+		})).
+		Return(expectedUser, store.ErrUsernameAlreadyExists)
+
+	uhs.userHandler.HandleRegisterUser(ctx)
+
+	uhs.Equal(http.StatusConflict, rec.Code)
+	uhs.Contains(rec.Body.String(), "username already taken")
+}
+
+func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_EmailInUse() {
+	rec := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(rec)
+
+	reqBody := map[string]string{
+		"username": "john",
+		"email":    "john@example.com",
+		"password": "strong-password",
+	}
+	b, _ := json.Marshal(reqBody)
+	ctx.Request = httptest.NewRequest(http.MethodPost, "/register", bytes.NewReader(b))
+	ctx.Request.Header.Set("Content-Type", "application/json")
+
+	expectedUser := &store.User{}
+
+	uhs.mockUserStore.
+		On("CreateUser", mock.MatchedBy(func(u *store.User) bool {
+			return u != nil && u.Username == "john" && u.Email == "john@example.com"
+		})).
+		Return(expectedUser, store.ErrEmailAlreadyExists)
+
+	uhs.userHandler.HandleRegisterUser(ctx)
+
+	uhs.Equal(http.StatusConflict, rec.Code)
+	uhs.Contains(rec.Body.String(), "email already in use")
+}
+
+func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_InternalServerError() {
+	rec := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(rec)
+
+	reqBody := map[string]string{
+		"username": "john",
+		"email":    "john@example.com",
+		"password": "strong-password",
+	}
+	b, _ := json.Marshal(reqBody)
+	ctx.Request = httptest.NewRequest(http.MethodPost, "/register", bytes.NewReader(b))
+	ctx.Request.Header.Set("Content-Type", "application/json")
+
+	expectedUser := &store.User{}
+
+	uhs.mockUserStore.
+		On("CreateUser", mock.MatchedBy(func(u *store.User) bool {
+			return u != nil && u.Username == "john" && u.Email == "john@example.com"
+		})).
+		Return(expectedUser, fmt.Errorf("internal error"))
+
+	uhs.userHandler.HandleRegisterUser(ctx)
+
+	uhs.Equal(http.StatusInternalServerError, rec.Code)
+	uhs.Contains(rec.Body.String(), "internal server error")
 }
 
 func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_Success() {

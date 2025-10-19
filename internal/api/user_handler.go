@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"log"
@@ -62,8 +63,12 @@ func (uh *UserHandler) HandleGetUserByUsername(ctx *gin.Context) {
 	}
 
 	user, err := uh.userStore.GetUserByUsername(username)
-	// TODO: check if username not found
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+			return
+		}
+
 		uh.logger.Printf("ERROR: getUsername %v", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
@@ -98,12 +103,20 @@ func (uh *UserHandler) HandleRegisterUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "invalid credentials"})
 		return
 	}
-	// TODO: Check that email is unique
+
 	newUser, err := uh.userStore.CreateUser(user)
 	if err != nil {
-		uh.logger.Printf("ERROR: createUser %v", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		switch err {
+		case store.ErrEmailAlreadyExists:
+			ctx.JSON(http.StatusConflict, gin.H{"error": "email already in use"})
+		case store.ErrUsernameAlreadyExists:
+			ctx.JSON(http.StatusConflict, gin.H{"error": "username already taken"})
+		default:
+			uh.logger.Printf("ERROR: createUser %v", err)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		}
 		return
 	}
+
 	ctx.JSON(http.StatusOK, newUser)
 }

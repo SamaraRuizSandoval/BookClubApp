@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -30,6 +31,11 @@ type User struct {
 	Role         UserRole  `json:"role"`
 	CreatedAt    time.Time `json:"created_at"`
 }
+
+var (
+	ErrEmailAlreadyExists    = errors.New("email already exists")
+	ErrUsernameAlreadyExists = errors.New("username already exists")
+)
 
 var AnonymusUser = &User{}
 
@@ -89,6 +95,12 @@ func (us *PostgresUserStore) CreateUser(user *User) (*User, error) {
 		user.Username, user.Email, user.PasswordHash.hash, user.Role,
 	).Scan(&user.ID, &user.CreatedAt)
 	if err != nil {
+		if strings.Contains(err.Error(), "users_email_key") {
+			return nil, ErrEmailAlreadyExists
+		}
+		if strings.Contains(err.Error(), "users_username_key") {
+			return nil, ErrUsernameAlreadyExists
+		}
 		return nil, err
 	}
 
@@ -143,7 +155,6 @@ func (us *PostgresUserStore) UpdateUser(user *User) error {
 func (us *PostgresUserStore) GetUserToken(scope, plainTextToken string) (*User, error) {
 	fmt.Println("scope:", scope, "plainTextToken:", plainTextToken)
 
-	// Hash the token string exactly as created
 	tokenHash := sha256.Sum256([]byte(plainTextToken))
 
 	query := `

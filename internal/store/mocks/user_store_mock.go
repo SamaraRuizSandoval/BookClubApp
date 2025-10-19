@@ -20,7 +20,7 @@ func (mus *MockUserStore) GetUserByUsername(username string) (*store.User, error
 }
 
 func (mus *MockUserStore) UpdateUser(user *store.User) error {
-	//TODO
+	// TODO
 	return nil
 }
 
