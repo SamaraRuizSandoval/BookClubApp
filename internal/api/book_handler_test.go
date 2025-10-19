@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/store"
+	"github.com/SamaraRuizSandoval/BookClubApp/internal/store/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -17,12 +18,12 @@ import (
 
 type BookHandlerTestSuite struct {
 	suite.Suite
-	mockStore *store.MockBookStore
+	mockStore *mocks.MockBookStore
 	handler   *BookHandler
 }
 
 func (s *BookHandlerTestSuite) SetupTest() {
-	s.mockStore = new(store.MockBookStore)
+	s.mockStore = new(mocks.MockBookStore)
 	var buf bytes.Buffer
 	logger := log.New(&buf, "TEST: ", log.Ldate|log.Ltime|log.Lshortfile)
 

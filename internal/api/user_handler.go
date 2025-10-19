@@ -62,8 +62,7 @@ func (uh *UserHandler) HandleGetUserByUsername(ctx *gin.Context) {
 	}
 
 	user, err := uh.userStore.GetUserByUsername(username)
-
-	//TODO: check if username not found
+	// TODO: check if username not found
 	if err != nil {
 		uh.logger.Printf("ERROR: getUsername %v", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -71,7 +70,6 @@ func (uh *UserHandler) HandleGetUserByUsername(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, user)
-
 }
 
 func (uh *UserHandler) HandleRegisterUser(ctx *gin.Context) {
@@ -83,7 +81,6 @@ func (uh *UserHandler) HandleRegisterUser(ctx *gin.Context) {
 	}
 
 	err := uh.validateRegisterRequest(&req)
-	//TODO: Check that email is unique
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -101,7 +98,7 @@ func (uh *UserHandler) HandleRegisterUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "invalid credentials"})
 		return
 	}
-
+	// TODO: Check that email is unique
 	newUser, err := uh.userStore.CreateUser(user)
 	if err != nil {
 		uh.logger.Printf("ERROR: createUser %v", err)

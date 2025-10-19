@@ -43,7 +43,6 @@ func (um *UserMiddleware) AuthMiddleware() gin.HandlerFunc {
 
 func (um *UserMiddleware) RequireUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		userValue, exists := c.Get("user")
 		if !exists {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "you must be logged in"})

@@ -7,6 +7,7 @@ require (
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/pressly/goose/v3 v3.25.0
 	github.com/stretchr/testify v1.11.1
+	golang.org/x/crypto v0.42.0
 )
 
 require (
@@ -44,7 +45,6 @@ require (
 	github.com/ugorji/go/codec v1.3.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.20.0 // indirect
-	golang.org/x/crypto v0.42.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
