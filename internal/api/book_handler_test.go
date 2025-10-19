@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/store"
+	"github.com/SamaraRuizSandoval/BookClubApp/internal/store/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -16,13 +18,16 @@ import (
 
 type BookHandlerTestSuite struct {
 	suite.Suite
-	mockStore *store.MockBookStore
+	mockStore *mocks.MockBookStore
 	handler   *BookHandler
 }
 
 func (s *BookHandlerTestSuite) SetupTest() {
-	s.mockStore = new(store.MockBookStore)
-	s.handler = NewBookHandler(s.mockStore)
+	s.mockStore = new(mocks.MockBookStore)
+	var buf bytes.Buffer
+	logger := log.New(&buf, "TEST: ", log.Ldate|log.Ltime|log.Lshortfile)
+
+	s.handler = NewBookHandler(s.mockStore, logger)
 }
 
 func TestBookHandlerTestSuite(t *testing.T) {

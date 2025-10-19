@@ -3,39 +3,38 @@ package api
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/store"
+	"github.com/SamaraRuizSandoval/BookClubApp/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type BookHandler struct {
 	bookStore store.BookStore
+	logger    *log.Logger
 }
 
-func NewBookHandler(bookStore store.BookStore) *BookHandler {
+func NewBookHandler(bookStore store.BookStore, logger *log.Logger) *BookHandler {
 	return &BookHandler{
 		bookStore: bookStore,
+		logger:    logger,
 	}
 }
 
 func (bh *BookHandler) HandleGetBookByID(ctx *gin.Context) {
-	paramsBookId := ctx.Param("id")
-	if paramsBookId == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
-		return
-	}
-
-	bookID, err := strconv.ParseInt(paramsBookId, 10, 64)
+	bookID, err := utils.ReadIDParam(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		bh.logger.Printf("ERROR: readIDParam %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid book id"})
 		return
 	}
 
 	book, err := bh.bookStore.GetBookByID(bookID)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch book"})
+		bh.logger.Printf("ERROR: getBookByID %v", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -50,13 +49,16 @@ func (bh *BookHandler) HandleGetBookByID(ctx *gin.Context) {
 func (bh *BookHandler) HandleAddBook(ctx *gin.Context) {
 	var book store.Book
 	if err := ctx.ShouldBindJSON(&book); err != nil {
+		bh.logger.Printf("ERROR: decodingAddBook %v", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
 	addedBook, err := bh.bookStore.AddBook(&book)
+	// TODO: Check if book already exists
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to add book"})
+		bh.logger.Printf("ERROR: addBook %v", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -64,21 +66,17 @@ func (bh *BookHandler) HandleAddBook(ctx *gin.Context) {
 }
 
 func (bh *BookHandler) HandleUpdateBookByID(ctx *gin.Context) {
-	paramsBookId := ctx.Param("id")
-	if paramsBookId == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
-		return
-	}
-
-	bookID, err := strconv.ParseInt(paramsBookId, 10, 64)
+	bookID, err := utils.ReadIDParam(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		bh.logger.Printf("ERROR: readIDParam %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid book id"})
 		return
 	}
 
 	existingBook, err := bh.bookStore.GetBookByID(bookID)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch book"})
+		bh.logger.Printf("ERROR: getBookByID %v", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -89,6 +87,7 @@ func (bh *BookHandler) HandleUpdateBookByID(ctx *gin.Context) {
 
 	var updatebookRequest store.Book
 	if err := ctx.ShouldBindJSON(&updatebookRequest); err != nil {
+		bh.logger.Printf("ERROR: updateBookByID %v", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
@@ -96,13 +95,15 @@ func (bh *BookHandler) HandleUpdateBookByID(ctx *gin.Context) {
 	updatebookRequest.ID = existingBook.ID
 	err = bh.bookStore.UpdateBook(&updatebookRequest)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "update book"})
+		bh.logger.Printf("ERROR: updateBookByID %v", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
 	updatedBook, err := bh.bookStore.GetBookByID(bookID)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch book"})
+		bh.logger.Printf("ERROR: getBookByID %v", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -110,15 +111,10 @@ func (bh *BookHandler) HandleUpdateBookByID(ctx *gin.Context) {
 }
 
 func (bh *BookHandler) HandleDeleteBookByID(ctx *gin.Context) {
-	paramsBookId := ctx.Param("id")
-	if paramsBookId == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
-		return
-	}
-
-	bookID, err := strconv.ParseInt(paramsBookId, 10, 64)
+	bookID, err := utils.ReadIDParam(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		bh.logger.Printf("ERROR: readIDParam %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid book id"})
 		return
 	}
 
@@ -127,7 +123,8 @@ func (bh *BookHandler) HandleDeleteBookByID(ctx *gin.Context) {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": "book not found"})
 			return
 		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete book"})
+			bh.logger.Printf("ERROR: deleteBookByID %v", err)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 			return
 		}
 	}

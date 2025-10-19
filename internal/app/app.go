@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/api"
+	"github.com/SamaraRuizSandoval/BookClubApp/internal/middleware"
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/store"
 	"github.com/SamaraRuizSandoval/BookClubApp/migrations"
 	"github.com/gin-gonic/gin"
@@ -14,9 +15,12 @@ import (
 
 // Resourses that we can use through our application
 type Application struct {
-	Logger      *log.Logger
-	DB          *sql.DB
-	BookHandler *api.BookHandler
+	Logger       *log.Logger
+	DB           *sql.DB
+	Middleware   middleware.UserMiddleware
+	BookHandler  *api.BookHandler
+	UserHandler  *api.UserHandler
+	TokenHandler *api.TokenHandler
 }
 
 func NewApplication() (*Application, error) {
@@ -31,14 +35,23 @@ func NewApplication() (*Application, error) {
 	}
 
 	bookStore := store.NewPostgresBookStore(pgDB)
-
-	bookHandler := api.NewBookHandler(bookStore)
+	userStore := store.NewPostgresUserStore(pgDB)
+	tokenStore := store.NewPostgresTokenStore(pgDB)
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+	middlewareHandler := middleware.UserMiddleware{UserStore: userStore}
+
+	bookHandler := api.NewBookHandler(bookStore, logger)
+	userHandler := api.NewUserHandler(userStore, logger)
+	tokenHandler := api.NewTokenHandler(tokenStore, userStore, logger)
+
 	app := &Application{
-		Logger:      logger,
-		DB:          pgDB,
-		BookHandler: bookHandler,
+		Logger:       logger,
+		DB:           pgDB,
+		Middleware:   middlewareHandler,
+		BookHandler:  bookHandler,
+		UserHandler:  userHandler,
+		TokenHandler: tokenHandler,
 	}
 
 	return app, nil
