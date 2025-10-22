@@ -17,9 +17,7 @@ import {
   IonLabel,
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { homeOutline, bookmarkOutline, settingsOutline } from 'ionicons/icons';
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import { homeOutline, starOutline, settingsOutline } from 'ionicons/icons';
 import { Route, Switch, Redirect, useLocation } from 'react-router-dom';
 
 function Page({ title }: { title: string }) {
@@ -42,15 +40,19 @@ function Page({ title }: { title: string }) {
   );
 }
 
-const menuItems: Array<{
+const mainMenuItems: Array<{
   to: string;
   icon: string;
   label: string;
 }> = [
   { to: '/home', icon: homeOutline, label: 'Home' },
-  { to: '/saved', icon: bookmarkOutline, label: 'Saved' },
-  { to: '/settings', icon: settingsOutline, label: 'Settings' },
+  { to: '/saved', icon: starOutline, label: 'Favorites' },
 ];
+const settingsMenuItem = {
+  to: '/settings',
+  icon: settingsOutline,
+  label: 'Settings',
+};
 
 function LeftMenu() {
   const location = useLocation();
@@ -62,26 +64,49 @@ function LeftMenu() {
           <IonTitle>BookClub</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent>
-        <IonList inset>
-          {menuItems.map(({ to, icon, label }) => {
-            const active = location.pathname.startsWith(to);
-            return (
-              <IonMenuToggle key={to} autoHide={false}>
-                <IonItem
-                  button
-                  detail={false}
-                  color={active ? 'primary' : undefined}
-                  routerLink={to}
-                  routerDirection="root"
-                >
-                  <IonIcon slot="start" icon={icon} />
-                  <IonLabel>{label}</IonLabel>
-                </IonItem>
-              </IonMenuToggle>
-            );
-          })}
-        </IonList>
+      <IonContent className="menu-content">
+        <div
+          style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+        >
+          <IonList inset>
+            {mainMenuItems.map(({ to, icon, label }) => {
+              const active = location.pathname.startsWith(to);
+              return (
+                <IonMenuToggle key={to} autoHide={false}>
+                  <IonItem
+                    button
+                    detail={false}
+                    color={active ? 'primary' : undefined}
+                    routerLink={to}
+                    routerDirection="root"
+                  >
+                    <IonIcon slot="start" icon={icon} />
+                    <IonLabel>{label}</IonLabel>
+                  </IonItem>
+                </IonMenuToggle>
+              );
+            })}
+          </IonList>
+          <div style={{ flex: 1 }} />
+          <IonList inset>
+            <IonMenuToggle key={settingsMenuItem.to} autoHide={false}>
+              <IonItem
+                button
+                detail={false}
+                color={
+                  location.pathname.startsWith(settingsMenuItem.to)
+                    ? 'primary'
+                    : undefined
+                }
+                routerLink={settingsMenuItem.to}
+                routerDirection="root"
+              >
+                <IonIcon slot="start" icon={settingsMenuItem.icon} />
+                <IonLabel>{settingsMenuItem.label}</IonLabel>
+              </IonItem>
+            </IonMenuToggle>
+          </IonList>
+        </div>
       </IonContent>
     </IonMenu>
   );
