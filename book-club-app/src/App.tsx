@@ -18,8 +18,6 @@ import {
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { homeOutline, starOutline, settingsOutline } from 'ionicons/icons';
-import React from 'react';
-import { createRoot } from 'react-dom/client';
 import { Route, Switch, Redirect, useLocation } from 'react-router-dom';
 
 function Page({ title }: { title: string }) {
