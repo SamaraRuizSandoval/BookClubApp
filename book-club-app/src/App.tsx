@@ -20,6 +20,8 @@ import { IonReactRouter } from '@ionic/react-router';
 import { homeOutline, starOutline, settingsOutline } from 'ionicons/icons';
 import { Route, Switch, Redirect, useLocation } from 'react-router-dom';
 
+import { DynamicMenu } from './components/';
+
 function Page({ title }: { title: string }) {
   const location = useLocation();
   return (
@@ -117,6 +119,7 @@ function AppShell() {
     <IonReactRouter>
       <IonSplitPane when="md" contentId="main-content">
         <LeftMenu />
+        <DynamicMenu />
         <IonRouterOutlet id="main-content">
           <Switch>
             <Route path="/home" component={() => <Page title="Home" />} />
