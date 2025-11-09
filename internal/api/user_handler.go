@@ -30,6 +30,10 @@ type RegisterUserRequest struct {
 	Password string `json:"password"`
 }
 
+type HTTPError struct {
+	Error string `json:"error"`
+}
+
 func (uh *UserHandler) validateRegisterRequest(req *RegisterUserRequest) error {
 	if req.Username == "" {
 		return errors.New("username is required")
@@ -77,7 +81,19 @@ func (uh *UserHandler) HandleGetUserByUsername(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
-func (uh *UserHandler) HandleRegisterUser(ctx *gin.Context) {
+// RegisterUser godoc
+// @Summary      Register a new user account
+// @Description  Registers a new user in the system. Expects a JSON body containing username, email, and password. Returns the created account object on success.
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        request body RegisterUserRequest true "Register user request"
+// @Success      200 {object} store.User
+// @Failure      400 {object} HTTPError "invalid request body or validation failed"
+// @Failure      409 {object} HTTPError "email or username already exists"
+// @Failure      500 {object} HTTPError "internal server error"
+// @Router       /users [post]
+func (uh *UserHandler) RegisterUser(ctx *gin.Context) {
 	var req RegisterUserRequest
 	if err := json.NewDecoder(ctx.Request.Body).Decode(&req); err != nil {
 		uh.logger.Printf("ERROR: decodingRegisterUser %v", err)

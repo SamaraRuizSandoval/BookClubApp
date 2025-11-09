@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	_ "github.com/SamaraRuizSandoval/BookClubApp/docs"
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/api"
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/middleware"
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/store"
