@@ -1,5 +1,41 @@
 basePath: /
 definitions:
+  api.AddBookRequest:
+    properties:
+      authors:
+        example:
+        - J.R.R. Tolkien
+        items:
+          type: string
+        type: array
+      book_images:
+        $ref: '#/definitions/store.BookImages'
+      chapters:
+        items:
+          $ref: '#/definitions/store.Chapter'
+        type: array
+      description:
+        example: A fantasy novel...
+        type: string
+      isbn_10:
+        example: "0261102214"
+        type: string
+      isbn_13:
+        example: "9780261102217"
+        type: string
+      page_count:
+        example: 310
+        type: integer
+      published_date:
+        example: "1937-09-21"
+        type: string
+      publisher:
+        example: George Allen & Unwin
+        type: string
+      title:
+        example: The Hobbit
+        type: string
+    type: object
   api.HTTPError:
     properties:
       error:
@@ -12,6 +48,60 @@ definitions:
       password:
         type: string
       username:
+        type: string
+    type: object
+  api.createTokenRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  store.Book:
+    properties:
+      authors:
+        items:
+          type: string
+        type: array
+      book_images:
+        $ref: '#/definitions/store.BookImages'
+      chapters:
+        items:
+          $ref: '#/definitions/store.Chapter'
+        type: array
+      description:
+        type: string
+      id:
+        type: integer
+      isbn_10:
+        type: string
+      isbn_13:
+        type: string
+      page_count:
+        type: integer
+      published_date:
+        type: string
+      publisher:
+        type: string
+      title:
+        type: string
+    type: object
+  store.BookImages:
+    properties:
+      large_url:
+        type: string
+      medium_url:
+        type: string
+      small_url:
+        type: string
+      thumbnail_url:
+        type: string
+    type: object
+  store.Chapter:
+    properties:
+      number:
+        type: integer
+      title:
         type: string
     type: object
   store.User:
@@ -35,6 +125,13 @@ definitions:
     x-enum-varnames:
     - RoleUser
     - RoleAdmin
+  tokens.Token:
+    properties:
+      expriy:
+        type: string
+      token:
+        type: string
+    type: object
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
@@ -54,6 +151,142 @@ info:
   title: BookClubApp
   version: "1.0"
 paths:
+  /books:
+    post:
+      consumes:
+      - application/json
+      description: Registers a book in the system.
+      parameters:
+      - description: Add book request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.AddBookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Book'
+        "401":
+          description: 'Error: Unauthorized'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "409":
+          description: 'Error: Duplicate record'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Add a book
+      tags:
+      - books
+  /books/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the details of a book by their id.
+      parameters:
+      - description: The id of the book
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Book'
+        "404":
+          description: 'Error: Book not found'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      summary: Get a book by id
+      tags:
+      - books
+    put:
+      consumes:
+      - application/json
+      description: Updates a book's information in the system.
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Add book request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.AddBookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Book'
+        "401":
+          description: 'Error: Unauthorized'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: 'Error: User not found'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Update a book
+      tags:
+      - books
+  /tokens/authentication:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user in the system. Expects a JSON body containing
+        username and password. Returns a bearer token on success.
+      parameters:
+      - description: Authentication Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.createTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/tokens.Token'
+        "401":
+          description: 'Error: Invalid Credentials'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      summary: Login
+      tags:
+      - auth
   /users:
     post:
       consumes:
@@ -75,21 +308,58 @@ paths:
           schema:
             $ref: '#/definitions/store.User'
         "400":
-          description: invalid request body or validation failed
+          description: 'Error: Invalid Request'
           schema:
             $ref: '#/definitions/api.HTTPError'
         "409":
-          description: email or username already exists
+          description: 'Error: Email or Username already exists'
           schema:
             $ref: '#/definitions/api.HTTPError'
         "500":
-          description: internal server error
+          description: 'Error: Internal server error'
           schema:
             $ref: '#/definitions/api.HTTPError'
       summary: Register a new user account
       tags:
-      - user
+      - users
+  /users/{username}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the details of a user by their username.
+      parameters:
+      - description: The username of the user
+        example: johndoe
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.User'
+        "400":
+          description: 'Error: Invalid or missing username'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: 'Error: User not found'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      summary: Get a user by username
+      tags:
+      - users
 securityDefinitions:
-  BasicAuth:
-    type: basic
+  BearerAuth:
+    description: Type "Bearer" followed by a space and your token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -24,6 +24,215 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/books": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registers a book in the system.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "books"
+                ],
+                "summary": "Add a book",
+                "parameters": [
+                    {
+                        "description": "Add book request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AddBookRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.Book"
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "409": {
+                        "description": "Error: Duplicate record",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/books/{id}": {
+            "get": {
+                "description": "Retrieves the details of a book by their id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "books"
+                ],
+                "summary": "Get a book by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "The id of the book",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.Book"
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Book not found",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates a book's information in the system.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "books"
+                ],
+                "summary": "Update a book",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Book ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Add book request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AddBookRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.Book"
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Error: User not found",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/tokens/authentication": {
+            "post": {
+                "description": "Authenticates a user in the system. Expects a JSON body containing username and password. Returns a bearer token on success.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "Authentication Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.createTokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/tokens.Token"
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Invalid Credentials",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "post": {
                 "description": "Registers a new user in the system. Expects a JSON body containing username, email, and password. Returns the created account object on success.",
@@ -34,7 +243,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "users"
                 ],
                 "summary": "Register a new user account",
                 "parameters": [
@@ -56,19 +265,70 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "invalid request body or validation failed",
+                        "description": "Error: Invalid Request",
                         "schema": {
                             "$ref": "#/definitions/api.HTTPError"
                         }
                     },
                     "409": {
-                        "description": "email or username already exists",
+                        "description": "Error: Email or Username already exists",
                         "schema": {
                             "$ref": "#/definitions/api.HTTPError"
                         }
                     },
                     "500": {
-                        "description": "internal server error",
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{username}": {
+            "get": {
+                "description": "Retrieves the details of a user by their username.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get a user by username",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "johndoe",
+                        "description": "The username of the user",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Invalid or missing username",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Error: User not found",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
                         "schema": {
                             "$ref": "#/definitions/api.HTTPError"
                         }
@@ -78,6 +338,57 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "api.AddBookRequest": {
+            "type": "object",
+            "properties": {
+                "authors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "J.R.R. Tolkien"
+                    ]
+                },
+                "book_images": {
+                    "$ref": "#/definitions/store.BookImages"
+                },
+                "chapters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/store.Chapter"
+                    }
+                },
+                "description": {
+                    "type": "string",
+                    "example": "A fantasy novel..."
+                },
+                "isbn_10": {
+                    "type": "string",
+                    "example": "0261102214"
+                },
+                "isbn_13": {
+                    "type": "string",
+                    "example": "9780261102217"
+                },
+                "page_count": {
+                    "type": "integer",
+                    "example": 310
+                },
+                "published_date": {
+                    "type": "string",
+                    "example": "1937-09-21"
+                },
+                "publisher": {
+                    "type": "string",
+                    "example": "George Allen \u0026 Unwin"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "The Hobbit"
+                }
+            }
+        },
         "api.HTTPError": {
             "type": "object",
             "properties": {
@@ -96,6 +407,89 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.createTokenRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "store.Book": {
+            "type": "object",
+            "properties": {
+                "authors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "book_images": {
+                    "$ref": "#/definitions/store.BookImages"
+                },
+                "chapters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/store.Chapter"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isbn_10": {
+                    "type": "string"
+                },
+                "isbn_13": {
+                    "type": "string"
+                },
+                "page_count": {
+                    "type": "integer"
+                },
+                "published_date": {
+                    "type": "string"
+                },
+                "publisher": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "store.BookImages": {
+            "type": "object",
+            "properties": {
+                "large_url": {
+                    "type": "string"
+                },
+                "medium_url": {
+                    "type": "string"
+                },
+                "small_url": {
+                    "type": "string"
+                },
+                "thumbnail_url": {
+                    "type": "string"
+                }
+            }
+        },
+        "store.Chapter": {
+            "type": "object",
+            "properties": {
+                "number": {
+                    "type": "integer"
+                },
+                "title": {
                     "type": "string"
                 }
             }
@@ -130,11 +524,25 @@ const docTemplate = `{
                 "RoleUser",
                 "RoleAdmin"
             ]
+        },
+        "tokens.Token": {
+            "type": "object",
+            "properties": {
+                "expriy": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
         }
     },
     "securityDefinitions": {
-        "BasicAuth": {
-            "type": "basic"
+        "BearerAuth": {
+            "description": "Type \"Bearer\" followed by a space and your token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     },
     "externalDocs": {
