@@ -16,6 +16,10 @@ COPY docs ./docs
 COPY internal ./internal
 COPY migrations ./migrations
 
+# --- Generate Swagger docs ---
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN swag init -g main.go -o internal/docs
+
 # Build
 RUN CGO_ENABLED=0 GOOS=linux go build -o /book-club-app
 

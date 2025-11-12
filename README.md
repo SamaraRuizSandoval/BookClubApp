@@ -22,19 +22,19 @@ A web application to manage, share, and comment your favorite books. The goal is
 ## ⚡ Getting Started
 
 ### 1. Frontend setup (React)
-``bash
+```bash
 cd book-club-app
 npm install
-npm start``
+npm start
 
 ### 2. Backend setup (Go)
-``bash
-cd backend
-go mod tidy
-go run main.go``
+#### 🐳 Run the backend
 
-By default, the backend will run on port 5000 but you can use the port flag to change the port. For example:
-`go run main.go -port 8081`
+From the project root:
+
+```bash
+docker compose up --build
+
 
 You can verify that the backend is running by navigating to:
 http://localhost:5000/health
