@@ -9,6 +9,7 @@ import (
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/store"
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgconn"
 )
 
 type BookHandler struct {
@@ -23,6 +24,20 @@ func NewBookHandler(bookStore store.BookStore, logger *log.Logger) *BookHandler 
 	}
 }
 
+// HandleGetBookByID godoc
+// @Summary      Get a book by id
+// @Description  Retrieves the details of a book by their id.
+//
+//	Provide a valid id. Returns the book object on success.
+//
+// @Tags         books
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "The id of the book"
+// @Success      200 {object} store.Book
+// @Failure      404 {object} HTTPError "Error: Book not found"
+// @Failure      500 {object} HTTPError "Error: Internal server error"
+// @Router       /books/{id} [get]
 func (bh *BookHandler) HandleGetBookByID(ctx *gin.Context) {
 	bookID, err := utils.ReadIDParam(ctx)
 	if err != nil {
@@ -46,17 +61,65 @@ func (bh *BookHandler) HandleGetBookByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, book)
 }
 
+type AddBookRequest struct {
+	Title         string           `json:"title" example:"The Hobbit"`
+	Authors       []string         `json:"authors" example:"J.R.R. Tolkien"`
+	Publisher     string           `json:"publisher" example:"George Allen & Unwin"`
+	PublishedDate store.JSONDate   `json:"published_date" example:"1937-09-21"`
+	Description   *string          `json:"description,omitempty" example:"A fantasy novel..."`
+	PageCount     *int             `json:"page_count,omitempty" example:"310"`
+	ISBN13        string           `json:"isbn_13" example:"9780261102217"`
+	ISBN10        *string          `json:"isbn_10,omitempty" example:"0261102214"`
+	Images        store.BookImages `json:"book_images"`
+	Chapters      []store.Chapter  `json:"chapters"`
+}
+
+// HandleAddBook godoc
+// @Summary      Add a book
+// @Description  Registers a book in the system.
+//
+//	Expects a body with the book information. Returns the created book on success.
+//
+// @Tags         books
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body AddBookRequest true "Add book request"
+// @Success      200 {object} store.Book
+// @Failure      401 {object} HTTPError "Error: Unauthorized"
+// @Failure      409 {object} HTTPError "Error: Duplicate record"
+// @Failure      500 {object} HTTPError "Error: Internal server error"
+// @Router       /books [post]
 func (bh *BookHandler) HandleAddBook(ctx *gin.Context) {
-	var book store.Book
-	if err := ctx.ShouldBindJSON(&book); err != nil {
+	var req AddBookRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		bh.logger.Printf("ERROR: decodingAddBook %v", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
+	book := store.Book{
+		Title:         req.Title,
+		Authors:       req.Authors,
+		Publisher:     req.Publisher,
+		PublishedDate: req.PublishedDate,
+		Description:   req.Description,
+		PageCount:     req.PageCount,
+		ISBN13:        req.ISBN13,
+		ISBN10:        req.ISBN10,
+		Images:        req.Images,
+		Chapters:      req.Chapters,
+	}
+
 	addedBook, err := bh.bookStore.AddBook(&book)
-	// TODO: Check if book already exists
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == "23505" {
+				ctx.JSON(http.StatusConflict, gin.H{"error": "book with this ISBN already exists"})
+				return
+			}
+		}
 		bh.logger.Printf("ERROR: addBook %v", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
@@ -65,6 +128,23 @@ func (bh *BookHandler) HandleAddBook(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, addedBook)
 }
 
+// HandleUpdateBookByID godoc
+// @Summary      Update a book
+// @Description  Updates a book's information in the system.
+//
+//	Expects a body with the book information. Returns the created book on success.
+//
+// @Tags         books
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id path int true "Book ID"
+// @Param        request body AddBookRequest true "Add book request"
+// @Success      200 {object} store.Book
+// @Failure      401 {object} HTTPError "Error: Unauthorized"
+// @Failure      404 {object} HTTPError "Error: User not found"
+// @Failure      500 {object} HTTPError "Error: Internal server error"
+// @Router       /books/{id} [put]
 func (bh *BookHandler) HandleUpdateBookByID(ctx *gin.Context) {
 	bookID, err := utils.ReadIDParam(ctx)
 	if err != nil {
@@ -85,15 +165,27 @@ func (bh *BookHandler) HandleUpdateBookByID(ctx *gin.Context) {
 		return
 	}
 
-	var updatebookRequest store.Book
-	if err := ctx.ShouldBindJSON(&updatebookRequest); err != nil {
+	var req AddBookRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		bh.logger.Printf("ERROR: updateBookByID %v", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
-	updatebookRequest.ID = existingBook.ID
-	err = bh.bookStore.UpdateBook(&updatebookRequest)
+	book := store.Book{
+		Title:         req.Title,
+		Authors:       req.Authors,
+		Publisher:     req.Publisher,
+		PublishedDate: req.PublishedDate,
+		Description:   req.Description,
+		PageCount:     req.PageCount,
+		ISBN13:        req.ISBN13,
+		ISBN10:        req.ISBN10,
+		Images:        req.Images,
+		Chapters:      req.Chapters,
+	}
+
+	err = bh.bookStore.UpdateBook(&book)
 	if err != nil {
 		bh.logger.Printf("ERROR: updateBookByID %v", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})

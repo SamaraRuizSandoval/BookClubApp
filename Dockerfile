@@ -12,8 +12,13 @@ RUN go mod download
 # Copy the source code. Note the slash at the end, as explained in
 # https://docs.docker.com/reference/dockerfile/#copy
 COPY main.go ./
+COPY docs ./docs
 COPY internal ./internal
 COPY migrations ./migrations
+
+# --- Generate Swagger docs ---
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN swag init -g main.go -o internal/docs
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux go build -o /book-club-app

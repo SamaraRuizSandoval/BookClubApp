@@ -35,20 +35,20 @@ func TestUserHandlerTestSuite(t *testing.T) {
 	suite.Run(t, new(UserHandlerTestSuite))
 }
 
-func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_InvalidJSON() {
+func (uhs *UserHandlerTestSuite) TestRegisterUser_InvalidJSON() {
 	rec := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(rec)
 
 	ctx.Request = httptest.NewRequest(http.MethodPost, "/register", strings.NewReader("{"))
 	ctx.Request.Header.Set("Content-Type", "application/json")
 
-	uhs.userHandler.HandleRegisterUser(ctx)
+	uhs.userHandler.RegisterUser(ctx)
 
 	uhs.Equal(http.StatusBadRequest, rec.Code)
 	uhs.Contains(rec.Body.String(), "invalid request body")
 }
 
-func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_MissingUsername() {
+func (uhs *UserHandlerTestSuite) TestRegisterUser_MissingUsername() {
 	rec := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(rec)
 
@@ -60,13 +60,13 @@ func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_MissingUsername() {
 	ctx.Request = httptest.NewRequest(http.MethodPost, "/register", bytes.NewReader(b))
 	ctx.Request.Header.Set("Content-Type", "application/json")
 
-	uhs.userHandler.HandleRegisterUser(ctx)
+	uhs.userHandler.RegisterUser(ctx)
 
 	uhs.Equal(http.StatusBadRequest, rec.Code)
 	uhs.Contains(rec.Body.String(), "username is required")
 }
 
-func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_InvalidEmail() {
+func (uhs *UserHandlerTestSuite) TestRegisterUser_InvalidEmail() {
 	rec := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(rec)
 
@@ -79,13 +79,13 @@ func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_InvalidEmail() {
 	ctx.Request = httptest.NewRequest(http.MethodPost, "/register", bytes.NewReader(b))
 	ctx.Request.Header.Set("Content-Type", "application/json")
 
-	uhs.userHandler.HandleRegisterUser(ctx)
+	uhs.userHandler.RegisterUser(ctx)
 
 	uhs.Equal(http.StatusBadRequest, rec.Code)
 	uhs.Contains(rec.Body.String(), "invalid email format")
 }
 
-func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_MissingPassword() {
+func (uhs *UserHandlerTestSuite) TestRegisterUser_MissingPassword() {
 	rec := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(rec)
 
@@ -97,13 +97,13 @@ func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_MissingPassword() {
 	ctx.Request = httptest.NewRequest(http.MethodPost, "/register", bytes.NewReader(b))
 	ctx.Request.Header.Set("Content-Type", "application/json")
 
-	uhs.userHandler.HandleRegisterUser(ctx)
+	uhs.userHandler.RegisterUser(ctx)
 
 	uhs.Equal(http.StatusBadRequest, rec.Code)
 	uhs.Contains(rec.Body.String(), "password is required")
 }
 
-func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_UsernameTaken() {
+func (uhs *UserHandlerTestSuite) TestRegisterUser_UsernameTaken() {
 	rec := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(rec)
 
@@ -124,13 +124,13 @@ func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_UsernameTaken() {
 		})).
 		Return(expectedUser, store.ErrUsernameAlreadyExists)
 
-	uhs.userHandler.HandleRegisterUser(ctx)
+	uhs.userHandler.RegisterUser(ctx)
 
 	uhs.Equal(http.StatusConflict, rec.Code)
 	uhs.Contains(rec.Body.String(), "username already taken")
 }
 
-func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_EmailInUse() {
+func (uhs *UserHandlerTestSuite) TestRegisterUser_EmailInUse() {
 	rec := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(rec)
 
@@ -151,13 +151,13 @@ func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_EmailInUse() {
 		})).
 		Return(expectedUser, store.ErrEmailAlreadyExists)
 
-	uhs.userHandler.HandleRegisterUser(ctx)
+	uhs.userHandler.RegisterUser(ctx)
 
 	uhs.Equal(http.StatusConflict, rec.Code)
 	uhs.Contains(rec.Body.String(), "email already in use")
 }
 
-func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_InternalServerError() {
+func (uhs *UserHandlerTestSuite) TestRegisterUser_InternalServerError() {
 	rec := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(rec)
 
@@ -178,13 +178,13 @@ func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_InternalServerError() {
 		})).
 		Return(expectedUser, fmt.Errorf("internal error"))
 
-	uhs.userHandler.HandleRegisterUser(ctx)
+	uhs.userHandler.RegisterUser(ctx)
 
 	uhs.Equal(http.StatusInternalServerError, rec.Code)
 	uhs.Contains(rec.Body.String(), "internal server error")
 }
 
-func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_Success() {
+func (uhs *UserHandlerTestSuite) TestRegisterUser_Success() {
 	rec := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(rec)
 
@@ -209,7 +209,7 @@ func (uhs *UserHandlerTestSuite) TestHandleRegisterUser_Success() {
 		})).
 		Return(expectedUser, nil)
 
-	uhs.userHandler.HandleRegisterUser(ctx)
+	uhs.userHandler.RegisterUser(ctx)
 
 	uhs.Equal(http.StatusOK, rec.Code)
 	uhs.Contains(rec.Body.String(), `"username":"john"`)

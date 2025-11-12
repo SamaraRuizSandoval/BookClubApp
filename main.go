@@ -6,9 +6,33 @@ import (
 	"net/http"
 	"time"
 
+	_ "github.com/SamaraRuizSandoval/BookClubApp/internal/api"
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/app"
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/routes"
 )
+
+// @title           BookClubApp
+// @version         1.0
+// @description     The BookClubApp to manage, share, and comment your favorite books. The goal is to create a space where you can interact and express your ideas and though as you go through the chapters of the books you are reading.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:5000
+// @BasePath  /
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and your token.
+
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
 
 func main() {
 	var port int

@@ -1,7 +1,9 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"time"
@@ -30,6 +32,17 @@ func NewTokenHandler(tokenStore store.TokenStore, userStore store.UserStore, log
 	}
 }
 
+// HandleCreateToken godoc
+// @Summary      Login
+// @Description  Authenticates a user in the system. Expects a JSON body containing username and password. Returns a bearer token on success.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request body createTokenRequest true "Authentication Request"
+// @Success      200 {object} tokens.Token
+// @Failure      401 {object} HTTPError "Error: Invalid Credentials"
+// @Failure      500 {object} HTTPError "Error: Internal server error"
+// @Router       /tokens/authentication [post]
 func (th *TokenHandler) HandleCreateToken(ctx *gin.Context) {
 	var req createTokenRequest
 	if err := json.NewDecoder(ctx.Request.Body).Decode(&req); err != nil {
@@ -40,6 +53,10 @@ func (th *TokenHandler) HandleCreateToken(ctx *gin.Context) {
 
 	user, err := th.userStore.GetUserByUsername(req.Username)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+			return
+		}
 		th.logger.Printf("ERROR: GetUserByUsername %v", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return

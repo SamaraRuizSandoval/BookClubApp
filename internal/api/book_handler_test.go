@@ -35,7 +35,7 @@ func TestBookHandlerTestSuite(t *testing.T) {
 }
 
 var expectedBook = &store.Book{
-	ID:        1,
+	ID:        0,
 	Title:     "1984",
 	Authors:   []string{"Test"},
 	Publisher: "test",

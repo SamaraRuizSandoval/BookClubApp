@@ -30,6 +30,10 @@ type RegisterUserRequest struct {
 	Password string `json:"password"`
 }
 
+type HTTPError struct {
+	Error string `json:"error"`
+}
+
 func (uh *UserHandler) validateRegisterRequest(req *RegisterUserRequest) error {
 	if req.Username == "" {
 		return errors.New("username is required")
@@ -55,6 +59,21 @@ func (uh *UserHandler) validateRegisterRequest(req *RegisterUserRequest) error {
 	return nil
 }
 
+// HandleGetUserByUsername godoc
+// @Summary      Get a user by username
+// @Description  Retrieves the details of a user by their username.
+//
+//	Provide a valid username as a path parameter. Returns the user object on success.
+//
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        username path string true "The username of the user" example(johndoe)
+// @Success      200 {object} store.User
+// @Failure      400 {object} HTTPError "Error: Invalid or missing username"
+// @Failure      404 {object} HTTPError "Error: User not found"
+// @Failure      500 {object} HTTPError "Error: Internal server error"
+// @Router       /users/{username} [get]
 func (uh *UserHandler) HandleGetUserByUsername(ctx *gin.Context) {
 	username := ctx.Param("username")
 	if username == "" {
@@ -77,7 +96,19 @@ func (uh *UserHandler) HandleGetUserByUsername(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
-func (uh *UserHandler) HandleRegisterUser(ctx *gin.Context) {
+// RegisterUser godoc
+// @Summary      Register a new user account
+// @Description  Registers a new user in the system. Expects a JSON body containing username, email, and password. Returns the created account object on success.
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        request body RegisterUserRequest true "Register user request"
+// @Success      200 {object} store.User
+// @Failure      400 {object} HTTPError "Error: Invalid Request"
+// @Failure      409 {object} HTTPError "Error: Email or Username already exists"
+// @Failure      500 {object} HTTPError "Error: Internal server error"
+// @Router       /users [post]
+func (uh *UserHandler) RegisterUser(ctx *gin.Context) {
 	var req RegisterUserRequest
 	if err := json.NewDecoder(ctx.Request.Body).Decode(&req); err != nil {
 		uh.logger.Printf("ERROR: decodingRegisterUser %v", err)
