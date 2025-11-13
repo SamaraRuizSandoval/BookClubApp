@@ -12,7 +12,7 @@ import (
 type JSONDate time.Time
 
 type Book struct {
-	ID            int        `json:"id"`
+	ID            int64      `json:"id"`
 	Title         string     `json:"title"`
 	Authors       []string   `json:"authors"`
 	Publisher     string     `json:"publisher"`
@@ -33,6 +33,7 @@ type BookImages struct {
 }
 
 type Chapter struct {
+	ID     int64  `json:"id"`
 	Number int    `json:"number"`
 	Title  string `json:"title"`
 }
@@ -75,7 +76,7 @@ func (pg *PostgresBookStore) AddBook(book *Book) (_ *Book, err error) {
 		return nil, err
 	}
 
-	var bookID int
+	var bookID int64
 	err = tx.QueryRow(`
         INSERT INTO books (title, publisher_id, published_date, description, page_count, isbn_13, isbn_10) 
         VALUES ($1,$2,$3,$4,$5,$6,$7) 
@@ -195,7 +196,7 @@ func (pg *PostgresBookStore) GetBookByID(id int64) (*Book, error) {
 	book.Images = images
 
 	chapterRows, err := pg.db.Query(`
-        SELECT number, title
+        SELECT id, number, title
         FROM chapters
         WHERE book_id = $1
         ORDER BY number
@@ -214,7 +215,7 @@ func (pg *PostgresBookStore) GetBookByID(id int64) (*Book, error) {
 	var chapters []Chapter
 	for chapterRows.Next() {
 		var ch Chapter
-		if err := chapterRows.Scan(&ch.Number, &ch.Title); err != nil {
+		if err := chapterRows.Scan(&ch.ID, &ch.Number, &ch.Title); err != nil {
 			return nil, err
 		}
 		chapters = append(chapters, ch)
@@ -278,7 +279,7 @@ func updateBookCore(tx *sql.Tx, book *Book) error {
 	return err
 }
 
-func updateBookAuthors(tx *sql.Tx, bookID int, authors []string) error {
+func updateBookAuthors(tx *sql.Tx, bookID int64, authors []string) error {
 	_, err := tx.Exec(`DELETE FROM book_authors WHERE book_id = $1`, bookID)
 	if err != nil {
 		return err
@@ -307,7 +308,7 @@ func updateBookAuthors(tx *sql.Tx, bookID int, authors []string) error {
 	return nil
 }
 
-func updateBookImages(tx *sql.Tx, bookID int, images BookImages) error {
+func updateBookImages(tx *sql.Tx, bookID int64, images BookImages) error {
 	_, err := tx.Exec(`
         INSERT INTO book_images (book_id, thumbnail_url, small_url, medium_url, large_url)
         VALUES ($1, $2, $3, $4, $5)
@@ -321,7 +322,7 @@ func updateBookImages(tx *sql.Tx, bookID int, images BookImages) error {
 	return err
 }
 
-func updateBookChapters(tx *sql.Tx, bookID int, chapters []Chapter) error {
+func updateBookChapters(tx *sql.Tx, bookID int64, chapters []Chapter) error {
 	_, err := tx.Exec(`DELETE FROM chapters WHERE book_id = $1`, bookID)
 	if err != nil {
 		return err

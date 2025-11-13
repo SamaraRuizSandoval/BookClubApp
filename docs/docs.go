@@ -187,6 +187,64 @@ const docTemplate = `{
                 }
             }
         },
+        "/chapters/{id}/comments": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Adds a user comment on a book's chapter. Expects a JSON body containing the body of the comment. Returns the created comment object on success.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comments"
+                ],
+                "summary": "Add a comment to a book's chapter",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Chapter ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Register comment request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AddChapterCommentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.ChapterComment"
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Invalid Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/tokens/authentication": {
             "post": {
                 "description": "Authenticates a user in the system. Expects a JSON body containing username and password. Returns a bearer token on success.",
@@ -389,6 +447,15 @@ const docTemplate = `{
                 }
             }
         },
+        "api.AddChapterCommentRequest": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string",
+                    "example": "I loved this chapter"
+                }
+            }
+        },
         "api.HTTPError": {
             "type": "object",
             "properties": {
@@ -486,11 +553,40 @@ const docTemplate = `{
         "store.Chapter": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "number": {
                     "type": "integer"
                 },
                 "title": {
                     "type": "string"
+                }
+            }
+        },
+        "store.ChapterComment": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "chapter_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/store.User"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },

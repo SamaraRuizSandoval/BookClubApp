@@ -36,6 +36,12 @@ definitions:
         example: The Hobbit
         type: string
     type: object
+  api.AddChapterCommentRequest:
+    properties:
+      body:
+        example: I loved this chapter
+        type: string
+    type: object
   api.HTTPError:
     properties:
       error:
@@ -99,10 +105,29 @@ definitions:
     type: object
   store.Chapter:
     properties:
+      id:
+        type: integer
       number:
         type: integer
       title:
         type: string
+    type: object
+  store.ChapterComment:
+    properties:
+      body:
+        type: string
+      chapter_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/store.User'
+      user_id:
+        type: integer
     type: object
   store.User:
     properties:
@@ -256,6 +281,44 @@ paths:
       summary: Update a book
       tags:
       - books
+  /chapters/{id}/comments:
+    post:
+      consumes:
+      - application/json
+      description: Adds a user comment on a book's chapter. Expects a JSON body containing
+        the body of the comment. Returns the created comment object on success.
+      parameters:
+      - description: Chapter ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Register comment request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.AddChapterCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.ChapterComment'
+        "400":
+          description: 'Error: Invalid Request'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Add a comment to a book's chapter
+      tags:
+      - comments
   /tokens/authentication:
     post:
       consumes:
