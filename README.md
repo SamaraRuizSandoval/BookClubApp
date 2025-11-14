@@ -26,55 +26,64 @@ A web application to manage, share, and comment your favorite books. The goal is
 cd book-club-app
 npm install
 npm start
+```
 
 ### 2. Backend setup (Go)
 #### 🐳 Run the backend
 
-From the project root:
+Use the following command to install the dependencies and run the backend:
 
 ```bash
 docker compose up --build
+```
 
 
 You can verify that the backend is running by navigating to:
 http://localhost:5000/health
 
+The internal API documentation can be found using the following link:
+http://localhost:5000/swagger/index.html
+
+
 ### 3. Building for Web
 To create a production-ready web build of the frontend:
 
-``bash
+```bash
 cd book-club-app
 npm run build
-``
+```
 
 ### Running as a Mobile App (Capacitor)
 The frontend can be packaged as an iOS/Android app using Capacitor.
 
-``bash
-# from project root
+Run from root:
+
+```bash
 npm install @capacitor/core @capacitor/cli
 npx cap init "BookClub" com.app.bookclub
+```
 
-# Add platforms
+Add platforms:
+```
 npx cap add ios
 npx cap add android
-``
+```
 
 Make sure capacitor.config.json has "webDir": "build".
 
 Building & syncing
 Whenever you change the frontend:
 
-``bash
+```bash
 cd book-club-app
 npm run build      # rebuild frontend
 npx cap copy       # copy build into native projects
-``
+```
 
 Opening native projects
-``bash
+```bash
 npx cap open ios     # opens in Xcode (Mac only)
 npx cap open android # opens in Android Studio
-``
+```
 
 From there you can run on simulators or devices.
