@@ -22,10 +22,12 @@ func SetupRouter(app *app.Application) *gin.Engine {
 		auth.POST("/books", app.BookHandler.HandleAddBook)
 		auth.PUT("/books/:id", app.BookHandler.HandleUpdateBookByID)
 		auth.DELETE("/books/:id", app.BookHandler.HandleDeleteBookByID)
-		auth.POST("/chapters/:id/comments", app.CommentHandler.HandleAddComment)
+		auth.POST("/chapters/:chapter_id/comments", app.CommentHandler.HandleAddComment)
 	}
 
 	r.GET("/books/:id", app.BookHandler.HandleGetBookByID)
+
+	r.GET("/chapters/:chapter_id/comments/:id", app.CommentHandler.HandleGetCommentById)
 
 	r.GET("/users/:username", app.UserHandler.HandleGetUserByUsername)
 	r.POST("/users", app.UserHandler.RegisterUser)

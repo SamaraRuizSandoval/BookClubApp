@@ -132,7 +132,7 @@ func (bh *BookHandler) HandleAddBook(ctx *gin.Context) {
 // @Summary      Update a book
 // @Description  Updates a book's information in the system.
 //
-//	Expects a body with the book information. Returns the created book on success.
+//	Expects a body with the book information. Returns the updated book on success.
 //
 // @Tags         books
 // @Accept       json

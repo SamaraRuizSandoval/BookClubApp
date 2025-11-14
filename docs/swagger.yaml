@@ -281,7 +281,7 @@ paths:
       summary: Update a book
       tags:
       - books
-  /chapters/{id}/comments:
+  /chapters/{chapter_id}/comments:
     post:
       consumes:
       - application/json
@@ -290,7 +290,7 @@ paths:
       parameters:
       - description: Chapter ID
         in: path
-        name: id
+        name: chapter_id
         required: true
         type: integer
       - description: Register comment request
@@ -310,6 +310,10 @@ paths:
           description: 'Error: Invalid Request'
           schema:
             $ref: '#/definitions/api.HTTPError'
+        "401":
+          description: 'Error: Unauthorized'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
         "500":
           description: 'Error: Internal server error'
           schema:
@@ -317,6 +321,90 @@ paths:
       security:
       - BearerAuth: []
       summary: Add a comment to a book's chapter
+      tags:
+      - comments
+  /chapters/{chapter_id}/comments/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the details of a specific comment .
+      parameters:
+      - description: Chapter ID
+        in: path
+        name: chapter_id
+        required: true
+        type: integer
+      - description: Comment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.ChapterComment'
+        "400":
+          description: 'Error: Invalid or missing id'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: 'Error: Comment not found'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      summary: Get a comment by id
+      tags:
+      - comments
+    put:
+      consumes:
+      - application/json
+      description: Updates a book's chapter comment. Expects a body with the edited
+        comment. Returns the updated comment on success.
+      parameters:
+      - description: Chapter ID
+        in: path
+        name: chapter_id
+        required: true
+        type: integer
+      - description: Comment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Edit comment request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.AddChapterCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.ChapterComment'
+        "401":
+          description: 'Error: Unauthorized'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: 'Error: User not found'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Update a comment
       tags:
       - comments
   /tokens/authentication:

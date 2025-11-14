@@ -20,3 +20,17 @@ func ReadIDParam(ctx *gin.Context) (int64, error) {
 
 	return id, nil
 }
+
+func ReadChapterIDParam(ctx *gin.Context) (int64, error) {
+	idParam := ctx.Param("chapter_id")
+	if idParam == "" {
+		return 0, errors.New("invalid id parameter")
+	}
+
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return 0, errors.New("invalid id parameter type")
+	}
+
+	return id, nil
+}

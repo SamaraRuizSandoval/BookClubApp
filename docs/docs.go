@@ -187,7 +187,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/chapters/{id}/comments": {
+        "/chapters/{chapter_id}/comments": {
             "post": {
                 "security": [
                     {
@@ -209,7 +209,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Chapter ID",
-                        "name": "id",
+                        "name": "chapter_id",
                         "in": "path",
                         "required": true
                     },
@@ -232,6 +232,138 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Error: Invalid Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/chapters/{chapter_id}/comments/{id}": {
+            "get": {
+                "description": "Retrieves the details of a specific comment .",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comments"
+                ],
+                "summary": "Get a comment by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Chapter ID",
+                        "name": "chapter_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Comment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.ChapterComment"
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Invalid or missing id",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Comment not found",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates a book's chapter comment. Expects a body with the edited comment. Returns the updated comment on success.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comments"
+                ],
+                "summary": "Update a comment",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Chapter ID",
+                        "name": "chapter_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Comment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Edit comment request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AddChapterCommentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.ChapterComment"
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Error: User not found",
                         "schema": {
                             "$ref": "#/definitions/api.HTTPError"
                         }
