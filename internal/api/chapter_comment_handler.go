@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -50,7 +49,7 @@ func (ch *ChapterCommentHandler) HandleAddComment(ctx *gin.Context) {
 		return
 	}
 
-	//TODO: Check that chapter exist
+	// TODO: Check that chapter exist
 
 	var req AddChapterCommentRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -79,7 +78,7 @@ func (ch *ChapterCommentHandler) HandleAddComment(ctx *gin.Context) {
 }
 
 // HandleUpdateComment godoc
-// @Summary      Update a comment
+// @Summary      Update a comment to a book's chapter
 // @Description  Updates a book's chapter comment. Expects a body with the edited comment. Returns the updated comment on success.
 // @Tags         comments
 // @Accept       json
@@ -90,7 +89,7 @@ func (ch *ChapterCommentHandler) HandleAddComment(ctx *gin.Context) {
 // @Param        request body AddChapterCommentRequest true "Edit comment request"
 // @Success      200 {object} store.ChapterComment
 // @Failure      401 {object} HTTPError "Error: Unauthorized"
-// @Failure      404 {object} HTTPError "Error: User not found"
+// @Failure      404 {object} HTTPError "Error: Comment not found"
 // @Failure      500 {object} HTTPError "Error: Internal server error"
 // @Router       /chapters/{chapter_id}/comments/{id} [put]
 func (ch *ChapterCommentHandler) HandleUpdateComment(ctx *gin.Context) {
@@ -101,13 +100,69 @@ func (ch *ChapterCommentHandler) HandleUpdateComment(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println(chapterID)
-	// TODO: Get comment by ID
-	//TODO: only aLlow a comment's edit to the owner of the comment
+	id, err := utils.ReadIDParam(ctx)
+	if err != nil {
+		ch.logger.Printf("ERROR: readIDParam %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
+		return
+	}
+
+	existingComment, err := ch.chapterCommentStore.GetCommentByID(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "comment not found"})
+			return
+		}
+
+		ch.logger.Printf("ERROR: GetCommentByID %v", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	if existingComment.ChapterID != chapterID {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "comment does not belong to the specified chapter"})
+		return
+	}
+
+	var req AddChapterCommentRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ch.logger.Printf("ERROR: decodingChapterComment %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return
+	}
+
+	comment := store.ChapterComment{
+		Body: req.Body,
+		ID:   id,
+	}
+
+	userValue, _ := ctx.Get("user")
+	user := userValue.(*store.User)
+
+	userID := int64(user.ID)
+	if existingComment.UserID != userID {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized to edit this comment"})
+		return
+	}
+
+	err = ch.chapterCommentStore.UpdateComment(&comment)
+	if err != nil {
+		ch.logger.Printf("ERROR: updateComment %v", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+	}
+
+	updatedComment, err := ch.chapterCommentStore.GetCommentByID(id)
+	if err != nil {
+		ch.logger.Printf("ERROR: GetCommentByID %v", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, updatedComment)
 }
 
 // HandleGetCommentById godoc
-// @Summary      Get a comment by id
+// @Summary      Get a comment to a book's chapter by id
 // @Description  Retrieves the details of a specific comment .
 //
 //	Provide a valid id as a path parameter. Returns the comment object on success.
@@ -123,14 +178,13 @@ func (ch *ChapterCommentHandler) HandleUpdateComment(ctx *gin.Context) {
 // @Failure      500 {object} HTTPError "Error: Internal server error"
 // @Router       /chapters/{chapter_id}/comments/{id} [get]
 func (ch *ChapterCommentHandler) HandleGetCommentById(ctx *gin.Context) {
-	// chapterID, err := utils.ReadChapterIDParam(ctx)
-	// if err != nil {
-	// 	ch.logger.Printf("ERROR: readChapterIDParam %v", err)
-	// 	ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid chapter id"})
-	// 	return
-	// }
+	chapterID, err := utils.ReadChapterIDParam(ctx)
+	if err != nil {
+		ch.logger.Printf("ERROR: readChapterIDParam %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid chapter id"})
+		return
+	}
 
-	//TODO check if chapter exists
 	id, err := utils.ReadIDParam(ctx)
 	if err != nil {
 		ch.logger.Printf("ERROR: readIDParam %v", err)
@@ -138,20 +192,84 @@ func (ch *ChapterCommentHandler) HandleGetCommentById(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println("id", id)
-
 	comment, err := ch.chapterCommentStore.GetCommentByID(id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "comment not found"})
 			return
 		}
 
-		ch.logger.Printf("ERROR: getUsername %v", err)
+		ch.logger.Printf("ERROR: GetCommentByID %v", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, comment)
+	if comment.ChapterID != chapterID {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "comment does not belong to the specified chapter"})
+		return
+	}
 
+	ctx.JSON(http.StatusOK, comment)
+}
+
+// HandleDeleteCommentById godoc
+// @Summary      Delete a comment to a book's chapter by id
+// @Description  Deletes a book's chapter comment. Returns the deleted comment on success.
+// @Tags         comments
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        chapter_id path int true "Chapter ID"
+// @Param        id path int true "Comment ID"
+// @Success      200
+// @Failure      401 {object} HTTPError "Error: Unauthorized"
+// @Failure      404 {object} HTTPError "Error: Comment not found"
+// @Failure      500 {object} HTTPError "Error: Internal server error"
+// @Router       /chapters/{chapter_id}/comments/{id} [delete]
+func (ch *ChapterCommentHandler) HandleDeleteCommentById(ctx *gin.Context) {
+	chapterID, err := utils.ReadChapterIDParam(ctx)
+	if err != nil {
+		ch.logger.Printf("ERROR: readChapterIDParam %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid chapter id"})
+		return
+	}
+
+	id, err := utils.ReadIDParam(ctx)
+	if err != nil {
+		ch.logger.Printf("ERROR: readIDParam %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
+		return
+	}
+
+	existingComment, err := ch.chapterCommentStore.GetCommentByID(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "comment not found"})
+			return
+		}
+
+		ch.logger.Printf("ERROR: GetCommentByID %v", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	if existingComment.ChapterID != chapterID {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "comment does not belong to the specified chapter"})
+		return
+	}
+
+	userValue, _ := ctx.Get("user")
+	user := userValue.(*store.User)
+
+	userID := int64(user.ID)
+	if existingComment.UserID != userID { // TODO: Add admin check
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized to edit this comment"})
+		return
+	}
+
+	err = ch.chapterCommentStore.DeleteCommentByID(id)
+	if err != nil {
+		ch.logger.Printf("ERROR: updateComment %v", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+	}
 }

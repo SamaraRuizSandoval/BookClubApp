@@ -324,6 +324,44 @@ paths:
       tags:
       - comments
   /chapters/{chapter_id}/comments/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a book's chapter comment. Returns the deleted comment on
+        success.
+      parameters:
+      - description: Chapter ID
+        in: path
+        name: chapter_id
+        required: true
+        type: integer
+      - description: Comment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: 'Error: Unauthorized'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: 'Error: Comment not found'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Delete a comment to a book's chapter by id
+      tags:
+      - comments
     get:
       consumes:
       - application/json
@@ -358,7 +396,7 @@ paths:
           description: 'Error: Internal server error'
           schema:
             $ref: '#/definitions/api.HTTPError'
-      summary: Get a comment by id
+      summary: Get a comment to a book's chapter by id
       tags:
       - comments
     put:
@@ -395,7 +433,7 @@ paths:
           schema:
             $ref: '#/definitions/api.HTTPError'
         "404":
-          description: 'Error: User not found'
+          description: 'Error: Comment not found'
           schema:
             $ref: '#/definitions/api.HTTPError'
         "500":
@@ -404,7 +442,7 @@ paths:
             $ref: '#/definitions/api.HTTPError'
       security:
       - BearerAuth: []
-      summary: Update a comment
+      summary: Update a comment to a book's chapter
       tags:
       - comments
   /tokens/authentication:

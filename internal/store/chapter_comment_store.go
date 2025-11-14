@@ -2,6 +2,7 @@ package store
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 )
 
@@ -37,9 +38,7 @@ func (cs *PostgresChapterCommentStore) AddComment(comment *ChapterComment, chapt
 		RETURNING id, created_at, updated_at`,
 		comment.Body, userID, chapterID,
 	).Scan(&comment.ID, &comment.CreatedAt, &comment.UpdatedAt)
-
 	if err != nil {
-		//TODO: Chapter doesn't exist error
 		return nil, err
 	}
 
@@ -58,7 +57,6 @@ func (cs *PostgresChapterCommentStore) UpdateComment(comment *ChapterComment) er
 		RETURNING updated_at`,
 		comment.Body, comment.ID,
 	).Scan(&comment.UpdatedAt)
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return sql.ErrNoRows
@@ -97,6 +95,22 @@ func (cs *PostgresChapterCommentStore) GetCommentByID(id int64) (*ChapterComment
 }
 
 func (cs *PostgresChapterCommentStore) DeleteCommentByID(id int64) error {
-	//TODO
+	res, err := cs.db.Exec(`
+		DELETE FROM comments
+		WHERE id = $1`,
+		id,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to delete comment: %w", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get affected rows: %w", err)
+	}
+	if rows == 0 {
+		return sql.ErrNoRows
+	}
+
 	return nil
 }
