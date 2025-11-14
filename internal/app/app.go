@@ -39,6 +39,7 @@ func NewApplication() (*Application, error) {
 	bookStore := store.NewPostgresBookStore(pgDB)
 	userStore := store.NewPostgresUserStore(pgDB)
 	tokenStore := store.NewPostgresTokenStore(pgDB)
+	chapterStore := store.NewPostgresChapterStore(pgDB)
 	commentStore := store.NewPostgresChapterCommentStore(pgDB)
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
@@ -47,7 +48,7 @@ func NewApplication() (*Application, error) {
 	bookHandler := api.NewBookHandler(bookStore, logger)
 	userHandler := api.NewUserHandler(userStore, logger)
 	tokenHandler := api.NewTokenHandler(tokenStore, userStore, logger)
-	commentHandler := api.NewChapterCommentHandler(commentStore, logger)
+	commentHandler := api.NewChapterCommentHandler(commentStore, chapterStore, logger)
 
 	app := &Application{
 		Logger:         logger,

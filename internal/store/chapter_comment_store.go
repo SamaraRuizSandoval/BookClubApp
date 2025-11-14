@@ -3,6 +3,7 @@ package store
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -29,6 +30,7 @@ type ChapterCommentStore interface {
 	UpdateComment(comment *ChapterComment) error
 	GetCommentByID(id int64) (*ChapterComment, error)
 	DeleteCommentByID(id int64) error
+	GetCommentsByChapterID(chapterID int64, page, limit int) ([]*ChapterComment, int, error)
 }
 
 func (cs *PostgresChapterCommentStore) AddComment(comment *ChapterComment, chapterID int64, userID int64) (*ChapterComment, error) {
@@ -113,4 +115,68 @@ func (cs *PostgresChapterCommentStore) DeleteCommentByID(id int64) error {
 	}
 
 	return nil
+}
+
+func (cs *PostgresChapterCommentStore) GetCommentsByChapterID(chapterID int64, page, limit int) ([]*ChapterComment, int, error) {
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 20
+	}
+
+	offset := (page - 1) * limit
+
+	rows, err := cs.db.Query(`
+        SELECT c.id, c.body, c.user_id, c.chapter_id, c.created_at, c.updated_at,
+               u.id, u.username, u.email, u.role
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.chapter_id = $1
+        ORDER BY c.created_at ASC
+        LIMIT $2 OFFSET $3;
+    `, chapterID, limit, offset)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer func() {
+		if closeErr := rows.Close(); closeErr != nil {
+			log.Printf("failed to close transaction: %v", closeErr)
+		}
+	}()
+
+	comments := []*ChapterComment{}
+
+	for rows.Next() {
+		comment := &ChapterComment{
+			User: &User{},
+		}
+
+		if err := rows.Scan(
+			&comment.ID,
+			&comment.Body,
+			&comment.UserID,
+			&comment.ChapterID,
+			&comment.CreatedAt,
+			&comment.UpdatedAt,
+			&comment.User.ID,
+			&comment.User.Username,
+			&comment.User.Email,
+			&comment.User.Role,
+		); err != nil {
+			return nil, 0, err
+		}
+
+		comments = append(comments, comment)
+	}
+
+	var total int
+	err = cs.db.QueryRow(`
+        SELECT COUNT(*) FROM comments WHERE chapter_id = $1;
+    `, chapterID).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return comments, total, nil
 }

@@ -28,3 +28,8 @@ func (mccs *MockChapterCommentStore) DeleteCommentByID(id int64) error {
 	args := mccs.Called(id)
 	return args.Error(0)
 }
+
+func (mccs *MockChapterCommentStore) GetCommentsByChapterID(chapterID int64, page, limit int) ([]*store.ChapterComment, int, error) {
+	args := mccs.Called(chapterID, page, limit)
+	return args.Get(0).([]*store.ChapterComment), args.Int(1), args.Error(2)
+}
