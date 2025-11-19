@@ -1,12 +1,29 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom'; // or '@testing-library/jest-dom/vitest'
+import { beforeEach, afterEach, vi } from 'vitest';
+
+// --- Control timers so Ionic's timeouts don't fire after teardown ---
+beforeEach(() => {
+  // Use fake timers so we control any setTimeout / setInterval that Ionic sets up
+  vi.useFakeTimers();
+});
+
+afterEach(() => {
+  // Run anything pending (like the ion-app timeout) *while window still exists*
+  vi.runOnlyPendingTimers();
+
+  // Back to real timers for next test/file
+  vi.useRealTimers();
+
+  // Optional: clean up DOM between tests
+  document.body.innerHTML = '';
+  document.head.innerHTML = '';
+});
+
+// --- Your existing JSDOM polyfills/mocks ---
 
 // JSDOM polyfills/mocks
 if (!window.matchMedia) {
   // Minimal mock that Ionic's SplitPane expects (addListener/removeListener)
-  // Vitest + JSDOM don’t implement matchMedia by default.
-  // This keeps IonSplitPane from throwing during tests.
-  // You can extend this if you need more behavior.
-
   window.matchMedia = ((query: string): any => {
     return {
       matches: false,
