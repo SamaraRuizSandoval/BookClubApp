@@ -10,6 +10,7 @@
     "vite": "^6.3.6"
   },
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "sync-types": "go run ./cmd/tsgen"
   }
 }
