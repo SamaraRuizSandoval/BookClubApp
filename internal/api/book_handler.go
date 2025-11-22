@@ -223,3 +223,53 @@ func (bh *BookHandler) HandleDeleteBookByID(ctx *gin.Context) {
 
 	ctx.Status(http.StatusNoContent)
 }
+
+type PaginatedBooksResponse struct {
+	Books      []*store.Book `json:"books"`
+	Page       int           `json:"page"`
+	Limit      int           `json:"limit"`
+	TotalItems int           `json:"total_items"`
+	TotalPages int           `json:"total_pages"`
+}
+
+// HandleGetAllBooks godoc
+// @Summary      Get all books
+// @Description  Retrieves all books with pagination.
+//
+//	Provide a valid page and limit parameters. Returns the paginated books object on success.
+//
+// @Tags         books
+// @Accept       json
+// @Produce      json
+// @Param        page query int false "Page number" default(1)
+// @Param        limit query int false "Items per page" default(20)
+// @Success      200 {object} PaginatedBooksResponse
+// @Failure      400 {object} HTTPError "Error: Invalid or missing id"
+// @Failure      404 {object} HTTPError "Error: Book not found"
+// @Failure      500 {object} HTTPError "Error: Internal server error"
+// @Router       /books [get]
+func (bh *BookHandler) HandleGetAllBooks(ctx *gin.Context) {
+	page, limit, err := utils.ReadPaginationParams(ctx)
+	if err != nil {
+		bh.logger.Printf("ERROR: readPaginationParams %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid pagination parameters"})
+		return
+	}
+
+	books, total, err := bh.bookStore.GetAllBooks(page, limit)
+	if err != nil {
+		bh.logger.Printf("ERROR: getAllBooks %v", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	totalPages := (total + limit - 1) / limit
+
+	ctx.JSON(http.StatusOK, PaginatedBooksResponse{
+		Books:      books,
+		Page:       page,
+		Limit:      limit,
+		TotalItems: total,
+		TotalPages: totalPages,
+	})
+}

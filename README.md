@@ -17,6 +17,9 @@ A web application to manage, share, and comment your favorite books. The goal is
 - **Database**: PostgreSQL
 - **Deployment**: Docker
 
+## 📝 Documentation
+[Database Schema](https://dbdiagram.io/d/BookClub-68bc7d4961a46d388ec627de)
+
 ---
 
 ## ⚡ Getting Started

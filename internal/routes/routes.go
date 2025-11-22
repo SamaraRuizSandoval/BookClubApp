@@ -29,6 +29,7 @@ func SetupRouter(app *app.Application) *gin.Engine {
 	}
 
 	r.GET("/books/:id", app.BookHandler.HandleGetBookByID)
+	r.GET("/books", app.BookHandler.HandleGetAllBooks)
 
 	r.GET("/chapters/:chapter_id/comments/", app.CommentHandler.HandleGetCommentsByChapterID)
 	r.GET("/chapters/:chapter_id/comments/:id", app.CommentHandler.HandleGetCommentById)
