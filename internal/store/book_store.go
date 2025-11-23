@@ -341,7 +341,6 @@ func (pg *PostgresBookStore) GetAllBooks(page, limit int) ([]*Book, int, error) 
 			&imagesJSON,
 			&chaptersJSON,
 		)
-
 		if err != nil {
 			return nil, 0, err
 		}
