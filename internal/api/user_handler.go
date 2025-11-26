@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"regexp"
@@ -68,14 +69,15 @@ func (uh *UserHandler) validateRegisterRequest(req *RegisterUserRequest) error {
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Param        username path string true "The username of the user" example(johndoe)
+// @Param        username query string true "Username" example(johndoe)
 // @Success      200 {object} store.User
 // @Failure      400 {object} HTTPError "Error: Invalid or missing username"
 // @Failure      404 {object} HTTPError "Error: User not found"
 // @Failure      500 {object} HTTPError "Error: Internal server error"
-// @Router       /users/{username} [get]
+// @Router       /users [get]
 func (uh *UserHandler) HandleGetUserByUsername(ctx *gin.Context) {
-	username := ctx.Param("username")
+	username := ctx.Query("username")
+	fmt.Println("USERNAME:", username)
 	if username == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid username"})
 		return

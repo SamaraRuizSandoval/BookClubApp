@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -23,6 +24,21 @@ func ReadIDParam(ctx *gin.Context) (int64, error) {
 
 func ReadChapterIDParam(ctx *gin.Context) (int64, error) {
 	idParam := ctx.Param("chapter_id")
+	if idParam == "" {
+		return 0, errors.New("invalid id parameter")
+	}
+
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return 0, errors.New("invalid id parameter type")
+	}
+
+	return id, nil
+}
+
+func ReadBookIDParam(ctx *gin.Context) (int64, error) {
+	idParam := ctx.Param("book_id")
+	fmt.Println(idParam)
 	if idParam == "" {
 		return 0, errors.New("invalid id parameter")
 	}
