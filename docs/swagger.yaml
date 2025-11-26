@@ -112,6 +112,8 @@ definitions:
         type: integer
       status:
         type: string
+      updated_at:
+        type: string
       user_id:
         type: integer
     type: object
@@ -228,6 +230,44 @@ info:
   title: BookClubApp
   version: "1.0"
 paths:
+  /admins:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new admin in the system (only allowed by another admin).
+        `Expects a JSON body containing username, email, and password. Returns the
+        created account object on success.
+      parameters:
+      - description: Register user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.RegisterUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.User'
+        "400":
+          description: 'Error: Invalid Request'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "409":
+          description: 'Error: Email or Username already exists'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Register a new admin account
+      tags:
+      - admins
   /books:
     get:
       consumes:

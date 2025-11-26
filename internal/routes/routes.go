@@ -16,10 +16,16 @@ func SetupRouter(app *app.Application) *gin.Engine {
 	r.GET("/health", app.HealthCheck)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	adminAuth := r.Group("/")
+	adminAuth.Use(app.Middleware.AuthMiddleware(), app.Middleware.RequireAdmin())
+	{
+		adminAuth.POST("/books", app.BookHandler.HandleAddBook)
+		adminAuth.POST("/admins", app.UserHandler.RegisterAdminAccount)
+	}
+
 	auth := r.Group("/")
 	auth.Use(app.Middleware.AuthMiddleware(), app.Middleware.RequireUser())
 	{
-		auth.POST("/books", app.BookHandler.HandleAddBook)
 		auth.PUT("/books/:id", app.BookHandler.HandleUpdateBookByID)
 		auth.DELETE("/books/:id", app.BookHandler.HandleDeleteBookByID)
 
