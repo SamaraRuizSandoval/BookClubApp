@@ -112,6 +112,8 @@ definitions:
         type: integer
       status:
         type: string
+      updated_at:
+        type: string
       user_id:
         type: integer
     type: object
@@ -181,6 +183,18 @@ definitions:
       user_id:
         type: integer
     type: object
+  store.UpdateUserBookRequest:
+    properties:
+      completed_at:
+        description: pointer-to-pointer allows null explicitly
+        type: string
+      pages_read:
+        type: integer
+      percentage_read:
+        type: number
+      status:
+        type: string
+    type: object
   store.User:
     properties:
       created_at:
@@ -193,6 +207,32 @@ definitions:
         $ref: '#/definitions/store.UserRole'
       username:
         type: string
+    type: object
+  store.UserBook:
+    properties:
+      book:
+        $ref: '#/definitions/store.Book'
+      book_id:
+        type: integer
+      completed_at:
+        type: string
+      id:
+        type: integer
+      pages_read:
+        type: integer
+      percentage_read:
+        type: number
+      progress_updated_at:
+        type: string
+      started_at:
+        type: string
+      status:
+        description: '"wishlist", "reading", "completed"'
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
     type: object
   store.UserRole:
     enum:
@@ -228,6 +268,44 @@ info:
   title: BookClubApp
   version: "1.0"
 paths:
+  /admins:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new admin in the system (only allowed by another admin).
+        `Expects a JSON body containing username, email, and password. Returns the
+        created account object on success.
+      parameters:
+      - description: Register user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.RegisterUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.User'
+        "400":
+          description: 'Error: Invalid Request'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "409":
+          description: 'Error: Email or Username already exists'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Register a new admin account
+      tags:
+      - admins
   /books:
     get:
       consumes:
@@ -607,6 +685,79 @@ paths:
       summary: Login
       tags:
       - auth
+  /user-books/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Removes the user-book entry entirely.
+      parameters:
+      - description: UserBook ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Deleted successfully
+        "400":
+          description: Invalid ID
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Delete a book from a user's shelf
+      tags:
+      - user_books
+    patch:
+      consumes:
+      - application/json
+      description: Updates only the fields provided in the JSON request.
+      parameters:
+      - description: UserBook ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Fields to update
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/store.UpdateUserBookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.UserBook'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Partially update a user-book relationship
+      tags:
+      - user_books
   /users:
     get:
       consumes:
