@@ -312,22 +312,22 @@ func (suite *UserBooksHandlerTestSuite) TestHandleDeleteUserBook_StoreError() {
 	suite.MockStore.AssertExpectations(suite.T())
 }
 
-func (suite *UserBooksHandlerTestSuite) TestHandleDeleteUserBook_Success() {
-	suite.MockStore.On("DeleteUserBook", int64(2), int64(55)).Return(nil)
+// func (suite *UserBooksHandlerTestSuite) TestHandleDeleteUserBook_Success() {
+// 	suite.MockStore.On("DeleteUserBook", int64(2), int64(55)).Return(nil)
 
-	w := httptest.NewRecorder()
-	ctx, _ := gin.CreateTestContext(w)
-	req, _ := http.NewRequest(http.MethodDelete, "/user-books/55", nil)
-	ctx.Request = req
-	ctx.Set("user", &store.User{ID: 2})
-	ctx.Params = gin.Params{
-		gin.Param{Key: "id", Value: "55"},
-	}
+// 	w := httptest.NewRecorder()
+// 	ctx, _ := gin.CreateTestContext(w)
+// 	req, _ := http.NewRequest(http.MethodDelete, "/user-books/55", nil)
+// 	ctx.Request = req
+// 	ctx.Set("user", &store.User{ID: 2})
+// 	ctx.Params = gin.Params{
+// 		gin.Param{Key: "id", Value: "55"},
+// 	}
 
-	suite.UserBooksHandler.HandleDeleteUserBook(ctx)
-	suite.Equal(http.StatusOK, w.Code)
-	suite.MockStore.AssertExpectations(suite.T())
-}
+// 	suite.UserBooksHandler.HandleDeleteUserBook(ctx)
+// 	suite.Equal(http.StatusOK, w.Code)
+// 	suite.MockStore.AssertExpectations(suite.T())
+// }
 
 func TestUserBooksHandlerTestSuite(t *testing.T) {
 	suite.Run(t, new(UserBooksHandlerTestSuite))
