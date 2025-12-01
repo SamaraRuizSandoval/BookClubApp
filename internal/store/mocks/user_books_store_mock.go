@@ -19,12 +19,12 @@ func (mubs *MockUserBooksStore) AddUserBook(userID, bookID int64, status string)
 	return args.Get(0).(*store.UserBook), args.Error(1)
 }
 
-func (mubs *MockUserBooksStore) UpdateUserBook(ub *store.UserBook) error {
-	args := mubs.Called(ub)
-	return args.Error(0)
+func (mubs *MockUserBooksStore) UpdateUserBook(userID, userBookID int64, req store.UpdateUserBookRequest) (*store.UserBook, error) {
+	args := mubs.Called(userID, userBookID, req)
+	return args.Get(0).(*store.UserBook), args.Error(1)
 }
 
-func (mubs *MockUserBooksStore) DeleteUserBook(userID, bookID int64) error {
-	args := mubs.Called(userID, bookID)
+func (mubs *MockUserBooksStore) DeleteUserBook(userID, userBookID int64) error {
+	args := mubs.Called(userID, userBookID)
 	return args.Error(0)
 }

@@ -34,6 +34,8 @@ func SetupRouter(app *app.Application) *gin.Engine {
 		auth.DELETE("/chapters/:chapter_id/comments/:id", app.CommentHandler.HandleDeleteCommentById)
 		auth.POST("/users/:user_id/books", app.UserBooksHandler.HandleAddUserBook)
 		auth.GET("/users/:user_id/books", app.UserBooksHandler.HandleGetUserBooks)
+		auth.PATCH("/user-books/:id", app.UserBooksHandler.HandleUpdateUserBook)
+		auth.DELETE("/user-books/:id", app.UserBooksHandler.HandleDeleteUserBook)
 	}
 
 	r.GET("/books/:id", app.BookHandler.HandleGetBookByID)

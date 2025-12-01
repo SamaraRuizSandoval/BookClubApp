@@ -3,7 +3,9 @@ package store
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
+	"strings"
 )
 
 type UserBook struct {
@@ -18,6 +20,13 @@ type UserBook struct {
 	ProgressUpdatedAt *JSONDate `json:"progress_updated_at,omitempty"`
 	UpdatedAt         JSONDate  `json:"updated_at"`
 	Book              *Book     `json:"book,omitempty"`
+}
+
+type UpdateUserBookRequest struct {
+	Status         *string    `json:"status"`
+	PagesRead      *int       `json:"pages_read"`
+	PercentageRead *float64   `json:"percentage_read"`
+	CompletedAt    **JSONDate `json:"completed_at"` // pointer-to-pointer allows null explicitly
 }
 
 type BasicUserBook struct {
@@ -38,11 +47,9 @@ func NewUserBooksStore(db *sql.DB) *PostgresUserBooksStore {
 
 type UserBooksStore interface {
 	GetUserBooksByUserID(userID int64, status *string, page, limit int) ([]*BasicUserBook, error)
-	// GetUserBookByID
-	// GetUserShelvesByUserID
 	AddUserBook(userid, bookid int64, status string) (*UserBook, error)
-	UpdateUserBook(ub *UserBook) error
-	DeleteUserBook(userID, bookID int64) error
+	UpdateUserBook(userID, userBookID int64, req UpdateUserBookRequest) (*UserBook, error)
+	DeleteUserBook(userID, userBookID int64) error
 }
 
 func (pub *PostgresUserBooksStore) GetUserBooksByUserID(userID int64, status *string, page, limit int) ([]*BasicUserBook, error) {
@@ -170,12 +177,125 @@ func (pub *PostgresUserBooksStore) AddUserBook(userid, bookid int64, status stri
 	return userBook, nil
 }
 
-func (pub *PostgresUserBooksStore) UpdateUserBook(ub *UserBook) error {
-	// Implementation goes here
-	return nil
+func (pub *PostgresUserBooksStore) UpdateUserBook(userID, userBookID int64, req UpdateUserBookRequest) (*UserBook, error) {
+	// "setClauses" collects the SQL pieces for columns that actually change.
+	setClauses := []string{}
+	args := []interface{}{}
+
+	// If user sent a new status
+	if req.Status != nil {
+		setClauses = append(setClauses,
+			fmt.Sprintf("status = $%d", len(args)+1),
+		)
+		args = append(args, *req.Status)
+	}
+
+	// If user sent a completed_at field
+	if req.CompletedAt != nil {
+		if *req.CompletedAt == nil {
+			// User explicitly sent: "completed_at": null
+			setClauses = append(setClauses, "completed_at = NULL")
+		} else {
+			// User sent a real timestamp
+			setClauses = append(setClauses,
+				fmt.Sprintf("completed_at = $%d", len(args)+1),
+			)
+			args = append(args, **req.CompletedAt)
+		}
+	}
+
+	if req.Status != nil && *req.Status == "completed" {
+		// Only set completed_at automatically if the user didn't set it manually
+		if req.CompletedAt == nil {
+			setClauses = append(setClauses, "completed_at = NOW()")
+		}
+	}
+
+	// If user updated pages_read
+	if req.PagesRead != nil {
+		setClauses = append(setClauses,
+			fmt.Sprintf("pages_read = $%d", len(args)+1),
+		)
+		args = append(args, *req.PagesRead)
+		// We also update progress timestamp
+		setClauses = append(setClauses, "progress_updated_at = NOW()")
+	}
+
+	// If user updated percentage_read
+	if req.PercentageRead != nil {
+		setClauses = append(setClauses,
+			fmt.Sprintf("percentage_read = $%d", len(args)+1),
+		)
+		args = append(args, *req.PercentageRead)
+		// Same: progress was updated
+		setClauses = append(setClauses, "progress_updated_at = NOW()")
+	}
+
+	// User sent an empty payload (nothing to update)
+	if len(setClauses) == 0 {
+		return nil, fmt.Errorf("no fields to update")
+	}
+
+	// Always update "updated_at"
+	setClauses = append(setClauses, "updated_at = NOW()")
+
+	// Build the SQL dynamically
+	query := fmt.Sprintf(`
+        UPDATE user_books
+        SET %s
+        WHERE id = $%d AND user_id = $%d
+        RETURNING id, user_id, book_id, status, updated_at,
+                  started_at, completed_at, pages_read, percentage_read,
+                  progress_updated_at
+    `,
+		strings.Join(setClauses, ", "),
+		len(args)+1, // ID placeholder
+		len(args)+2, // userID placeholder
+	)
+
+	// Add WHERE clause parameters
+	args = append(args, userBookID, userID)
+
+	// Execute query and scan result
+	userBook := &UserBook{}
+	err := pub.db.QueryRow(query, args...).Scan(
+		&userBook.ID,
+		&userBook.UserID,
+		&userBook.BookID,
+		&userBook.Status,
+		&userBook.UpdatedAt,
+		&userBook.StartedAt,
+		&userBook.CompletedAt,
+		&userBook.PagesRead,
+		&userBook.PercentageRead,
+		&userBook.ProgressUpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return userBook, nil
 }
 
-func (pub *PostgresUserBooksStore) DeleteUserBook(userID, bookID int64) error {
-	// Implementation goes here
+func (pub *PostgresUserBooksStore) DeleteUserBook(userID, userBookID int64) error {
+	// Delete only the row belonging to this user
+	res, err := pub.db.Exec(`
+        DELETE FROM user_books
+        WHERE id = $1 AND user_id = $2
+    `, userBookID, userID)
+	if err != nil {
+		return err
+	}
+
+	// Check if any row was actually deleted
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return sql.ErrNoRows
+	}
+
 	return nil
 }
