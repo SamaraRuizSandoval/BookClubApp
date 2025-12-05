@@ -12,7 +12,7 @@ on:
       - 'migrations/**'
       - 'docs/**'
       - 'Dockerfile'
-      - '.github/workflows/deploy-backend.yml'
+      - '.github/workflows/deploy-backend.yaml'
 
 permissions:
   id-token: write      
