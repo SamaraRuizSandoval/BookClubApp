@@ -1,8 +1,22 @@
 name: Deploy Backend
+run-name: "Backend Deployment"
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'main.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'internal/**'
+      - 'migrations/**'
+      - 'docs/**'
+      - 'Dockerfile'
+      - '.github/workflows/deploy-backend.yml'
+
+permissions:
+  id-token: write      
+  contents: read
 
 env:
   REGISTRY: bookclubregistry.azurecr.io
