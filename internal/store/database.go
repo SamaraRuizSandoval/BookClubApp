@@ -4,14 +4,30 @@ import (
 	"database/sql"
 	"fmt"
 	"io/fs"
+	"os"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/pressly/goose/v3"
 )
 
 func Open() (*sql.DB, error) {
-	// Connection to the DB using pgx as the driver
-	db, err := sql.Open("pgx", "host=db user=postgres password=postgres dbname=postgres port=5432 sslmode=disable")
+	host := os.Getenv("DB_HOST")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
+	port := os.Getenv("DB_PORT")
+	sslmode := os.Getenv("DB_SSLMODE")
+
+	if sslmode == "" {
+		sslmode = "require" // Azure default
+	}
+
+	connStr := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		host, user, password, dbname, port, sslmode,
+	)
+
+	db, err := sql.Open("pgx", connStr)
 	if err != nil {
 		return nil, fmt.Errorf("db: open %w", err)
 	}
