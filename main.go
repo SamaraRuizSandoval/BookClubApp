@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
 	_ "github.com/SamaraRuizSandoval/BookClubApp/internal/api"
@@ -23,7 +25,8 @@ import (
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host      localhost:5000
+// @schemes        https
+// @host      bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.
 // @BasePath  /
 
 // @securityDefinitions.apikey BearerAuth
@@ -38,6 +41,13 @@ func main() {
 	var port int
 	flag.IntVar(&port, "port", 5000, "go backend server port")
 	flag.Parse() // Future note, use os.Getenv
+
+	// Azure Container Apps uses PORT env var
+	if p := os.Getenv("PORT"); p != "" {
+		if parsed, err := strconv.Atoi(p); err == nil {
+			port = parsed
+		}
+	}
 
 	app, err := app.NewApplication()
 	if err != nil {
