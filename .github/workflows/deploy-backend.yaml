@@ -21,6 +21,8 @@ permissions:
 env:
   REGISTRY: bookclubregistry.azurecr.io
   IMAGE: bookclubapp-backend
+  CONTAINERAPP: bookclub-backend       
+  RESOURCE_GROUP: bookclub-rg   
 
 jobs:
   deploy:
