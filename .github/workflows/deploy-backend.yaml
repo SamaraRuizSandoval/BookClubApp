@@ -21,6 +21,8 @@ permissions:
 env:
   REGISTRY: bookclubregistry.azurecr.io
   IMAGE: bookclubapp-backend
+  CONTAINERAPP: bookclub-backend       
+  RESOURCE_GROUP: bookclub-rg   
 
 jobs:
   deploy:
@@ -29,6 +31,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t $REGISTRY/$IMAGE:${{ github.sha }} .
+          docker tag $REGISTRY/$IMAGE:${{ github.sha }} $REGISTRY/$IMAGE:latest
 
       - name: Azure Login
         uses: azure/login@v2
@@ -42,12 +49,8 @@ jobs:
         with:
           login-server: ${{ env.REGISTRY }}
           username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Build Docker image
-        run: |
-          docker build -t $REGISTRY/$IMAGE:${{ github.sha }} .
-          docker tag $REGISTRY/$IMAGE:${{ github.sha }} $REGISTRY/$IMAGE:latest
 
       - name: Push Docker image
         run: |
