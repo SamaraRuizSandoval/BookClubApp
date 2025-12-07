@@ -41,9 +41,8 @@ jobs:
         uses: azure/docker-login@v2
         with:
           login-server: ${{ env.REGISTRY }}
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}}
 
       - name: Build Docker image
         run: |
