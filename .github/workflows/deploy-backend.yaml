@@ -30,6 +30,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Build Docker image
+        run: |
+          docker build -t $REGISTRY/$IMAGE:${{ github.sha }} .
+          docker tag $REGISTRY/$IMAGE:${{ github.sha }} $REGISTRY/$IMAGE:latest
+
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -42,12 +47,8 @@ jobs:
         with:
           login-server: ${{ env.REGISTRY }}
           username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Build Docker image
-        run: |
-          docker build -t $REGISTRY/$IMAGE:${{ github.sha }} .
-          docker tag $REGISTRY/$IMAGE:${{ github.sha }} $REGISTRY/$IMAGE:latest
 
       - name: Push Docker image
         run: |
