@@ -5,5 +5,19 @@
   "globalHeaders": {
     "X-Frame-Options": "DENY",
     "X-Content-Type-Options": "nosniff"
-  }
+  },
+  "routes": [
+    {
+      "route": "/",
+      "headers": {
+        "cache-control": "no-cache, no-store, must-revalidate"
+      }
+    },
+    {
+      "route": "/index.html",
+      "headers": {
+        "cache-control": "no-cache, no-store, must-revalidate"
+      }
+    }
+  ]
 }
