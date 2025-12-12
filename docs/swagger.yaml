@@ -47,6 +47,21 @@ definitions:
       error:
         type: string
     type: object
+  api.PaginatedBooksResponse:
+    properties:
+      books:
+        items:
+          $ref: '#/definitions/store.Book'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total_items:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
   api.PaginatedCommentsResponse:
     properties:
       items:
@@ -71,12 +86,36 @@ definitions:
       username:
         type: string
     type: object
+  api.UserBooksResponse:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      user_books:
+        items:
+          $ref: '#/definitions/store.BasicUserBook'
+        type: array
+    type: object
   api.createTokenRequest:
     properties:
       password:
         type: string
       username:
         type: string
+    type: object
+  store.BasicUserBook:
+    properties:
+      book:
+        $ref: '#/definitions/store.Book'
+      id:
+        type: integer
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
     type: object
   store.Book:
     properties:
@@ -144,6 +183,18 @@ definitions:
       user_id:
         type: integer
     type: object
+  store.UpdateUserBookRequest:
+    properties:
+      completed_at:
+        description: pointer-to-pointer allows null explicitly
+        type: string
+      pages_read:
+        type: integer
+      percentage_read:
+        type: number
+      status:
+        type: string
+    type: object
   store.User:
     properties:
       created_at:
@@ -156,6 +207,32 @@ definitions:
         $ref: '#/definitions/store.UserRole'
       username:
         type: string
+    type: object
+  store.UserBook:
+    properties:
+      book:
+        $ref: '#/definitions/store.Book'
+      book_id:
+        type: integer
+      completed_at:
+        type: string
+      id:
+        type: integer
+      pages_read:
+        type: integer
+      percentage_read:
+        type: number
+      progress_updated_at:
+        type: string
+      started_at:
+        type: string
+      status:
+        description: '"wishlist", "reading", "completed"'
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
     type: object
   store.UserRole:
     enum:
@@ -191,7 +268,82 @@ info:
   title: BookClubApp
   version: "1.0"
 paths:
+  /admins:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new admin in the system (only allowed by another admin).
+        `Expects a JSON body containing username, email, and password. Returns the
+        created account object on success.
+      parameters:
+      - description: Register user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.RegisterUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.User'
+        "400":
+          description: 'Error: Invalid Request'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "409":
+          description: 'Error: Email or Username already exists'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Register a new admin account
+      tags:
+      - admins
   /books:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all books with pagination.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.PaginatedBooksResponse'
+        "400":
+          description: 'Error: Invalid or missing id'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: 'Error: Book not found'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      summary: Get all books
+      tags:
+      - books
     post:
       consumes:
       - application/json
@@ -533,7 +685,113 @@ paths:
       summary: Login
       tags:
       - auth
+  /user-books/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Removes the user-book entry entirely.
+      parameters:
+      - description: UserBook ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Deleted successfully
+        "400":
+          description: Invalid ID
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Delete a book from a user's shelf
+      tags:
+      - user_books
+    patch:
+      consumes:
+      - application/json
+      description: Updates only the fields provided in the JSON request.
+      parameters:
+      - description: UserBook ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Fields to update
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/store.UpdateUserBookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.UserBook'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Partially update a user-book relationship
+      tags:
+      - user_books
   /users:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the details of a user by their username.
+      parameters:
+      - description: Username
+        example: johndoe
+        in: query
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.User'
+        "400":
+          description: 'Error: Invalid or missing username'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: 'Error: User not found'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      summary: Get a user by username
+      tags:
+      - users
     post:
       consumes:
       - application/json
@@ -568,17 +826,60 @@ paths:
       summary: Register a new user account
       tags:
       - users
-  /users/{username}:
+  /users/{user_id}/books:
     get:
       consumes:
       - application/json
-      description: Retrieves the details of a user by their username.
+      description: Retrieves the books for a given user. Optional `status` query parameter
+        filters by reading status.
       parameters:
-      - description: The username of the user
-        example: johndoe
-        in: path
-        name: username
+      - description: Filter by status (wishlist|reading|completed)
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.UserBooksResponse'
+        "400":
+          description: 'Error: Invalid or missing id'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Get a user's books
+      tags:
+      - user_books
+    post:
+      consumes:
+      - application/json
+      description: Adds a book to a user's collection with a specified status.
+      parameters:
+      - description: Book ID
+        in: query
+        name: book_id
         required: true
+        type: integer
+      - description: Filter by status (wishlist|reading|completed)
+        in: query
+        name: status
         type: string
       produces:
       - application/json
@@ -586,22 +887,20 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/store.User'
+            $ref: '#/definitions/api.UserBooksResponse'
         "400":
-          description: 'Error: Invalid or missing username'
-          schema:
-            $ref: '#/definitions/api.HTTPError'
-        "404":
-          description: 'Error: User not found'
+          description: 'Error: Invalid or missing id'
           schema:
             $ref: '#/definitions/api.HTTPError'
         "500":
           description: 'Error: Internal server error'
           schema:
             $ref: '#/definitions/api.HTTPError'
-      summary: Get a user by username
+      security:
+      - BearerAuth: []
+      summary: Add a book to a user's collection
       tags:
-      - users
+      - user_books
 securityDefinitions:
   BearerAuth:
     description: Type "Bearer" followed by a space and your token.

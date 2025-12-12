@@ -2,6 +2,7 @@ package store
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -51,6 +52,7 @@ type BookStore interface {
 	GetBookByID(id int64) (*Book, error)
 	UpdateBook(book *Book) error
 	DeleteBookByID(id int64) error
+	GetAllBooks(page, limit int) ([]*Book, int, error)
 }
 
 func (pg *PostgresBookStore) AddBook(book *Book) (_ *Book, err error) {
@@ -253,6 +255,117 @@ func (pg *PostgresBookStore) UpdateBook(book *Book) error {
 	}
 
 	return tx.Commit()
+}
+
+func (pg *PostgresBookStore) GetAllBooks(page, limit int) ([]*Book, int, error) {
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 20
+	}
+
+	offset := (page - 1) * limit
+
+	rows, err := pg.db.Query(`
+		SELECT b.id, b.title, b.published_date, b.description, b.page_count, b.isbn_13, b.isbn_10,
+		p.name AS publisher,
+    
+    	COALESCE(
+        	json_agg(DISTINCT a.name) FILTER (WHERE a.id IS NOT NULL),
+        	'[]'
+    	) AS authors,
+
+    	COALESCE(
+        	json_build_object(
+            'thumbnail_url', bi.thumbnail_url,
+            'small_url',     bi.small_url,
+            'medium_url',    bi.medium_url,
+            'large_url',     bi.large_url
+        ),
+        '{}'    
+    	) AS images,
+
+		COALESCE(
+			json_agg(
+				jsonb_build_object(
+					'id',     c.id,
+					'number', c.number,
+					'title',  c.title
+				) ORDER BY c.number
+			) FILTER (WHERE c.id IS NOT NULL),
+			'[]'
+		) AS chapters
+
+		FROM books b
+		LEFT JOIN publishers p ON b.publisher_id = p.id
+		LEFT JOIN book_authors ba ON b.id = ba.book_id
+		LEFT JOIN authors a ON ba.author_id = a.id
+		LEFT JOIN book_images bi ON b.id = bi.book_id
+		LEFT JOIN chapters c ON b.id = c.book_id
+
+		GROUP BY 
+			b.id, p.name, bi.thumbnail_url, bi.small_url, bi.medium_url, bi.large_url
+
+		ORDER BY b.published_date DESC
+		LIMIT $1 OFFSET $2;
+	`, limit, offset)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer func() {
+		if closeErr := rows.Close(); closeErr != nil {
+			log.Printf("failed to close transaction: %v", closeErr)
+		}
+	}()
+
+	books := []*Book{}
+
+	for rows.Next() {
+		book := &Book{}
+
+		var authorsJSON []byte
+		var imagesJSON []byte
+		var chaptersJSON []byte
+
+		err := rows.Scan(
+			&book.ID,
+			&book.Title,
+			&book.PublishedDate,
+			&book.Description,
+			&book.PageCount,
+			&book.ISBN13,
+			&book.ISBN10,
+			&book.Publisher,
+			&authorsJSON,
+			&imagesJSON,
+			&chaptersJSON,
+		)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		if err := json.Unmarshal(authorsJSON, &book.Authors); err != nil {
+			return nil, 0, err
+		}
+
+		if err := json.Unmarshal(imagesJSON, &book.Images); err != nil {
+			return nil, 0, err
+		}
+
+		if err := json.Unmarshal(chaptersJSON, &book.Chapters); err != nil {
+			return nil, 0, err
+		}
+
+		books = append(books, book)
+	}
+
+	var count int
+	err = pg.db.QueryRow(`SELECT COUNT(*) FROM books`).Scan(&count)
+	if err != nil {
+		return nil, 0, err
+	}
+	return books, count, nil
 }
 
 func updateBookCore(tx *sql.Tx, book *Book) error {

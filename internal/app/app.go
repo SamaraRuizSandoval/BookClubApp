@@ -16,13 +16,14 @@ import (
 
 // Resourses that we can use through our application
 type Application struct {
-	Logger         *log.Logger
-	DB             *sql.DB
-	Middleware     middleware.UserMiddleware
-	BookHandler    *api.BookHandler
-	UserHandler    *api.UserHandler
-	TokenHandler   *api.TokenHandler
-	CommentHandler *api.ChapterCommentHandler
+	Logger           *log.Logger
+	DB               *sql.DB
+	Middleware       middleware.UserMiddleware
+	BookHandler      *api.BookHandler
+	UserHandler      *api.UserHandler
+	TokenHandler     *api.TokenHandler
+	UserBooksHandler *api.UserBooksHandler
+	CommentHandler   *api.ChapterCommentHandler
 }
 
 func NewApplication() (*Application, error) {
@@ -40,6 +41,7 @@ func NewApplication() (*Application, error) {
 	userStore := store.NewPostgresUserStore(pgDB)
 	tokenStore := store.NewPostgresTokenStore(pgDB)
 	chapterStore := store.NewPostgresChapterStore(pgDB)
+	userBooksStore := store.NewUserBooksStore(pgDB)
 	commentStore := store.NewPostgresChapterCommentStore(pgDB)
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
@@ -48,16 +50,18 @@ func NewApplication() (*Application, error) {
 	bookHandler := api.NewBookHandler(bookStore, logger)
 	userHandler := api.NewUserHandler(userStore, logger)
 	tokenHandler := api.NewTokenHandler(tokenStore, userStore, logger)
+	userBooksHandler := api.NewUserBooksHandler(userBooksStore, logger)
 	commentHandler := api.NewChapterCommentHandler(commentStore, chapterStore, logger)
 
 	app := &Application{
-		Logger:         logger,
-		DB:             pgDB,
-		Middleware:     middlewareHandler,
-		BookHandler:    bookHandler,
-		UserHandler:    userHandler,
-		TokenHandler:   tokenHandler,
-		CommentHandler: commentHandler,
+		Logger:           logger,
+		DB:               pgDB,
+		Middleware:       middlewareHandler,
+		BookHandler:      bookHandler,
+		UserHandler:      userHandler,
+		TokenHandler:     tokenHandler,
+		UserBooksHandler: userBooksHandler,
+		CommentHandler:   commentHandler,
 	}
 
 	return app, nil

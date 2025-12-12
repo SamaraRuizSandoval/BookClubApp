@@ -24,7 +24,119 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admins": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registers a new admin in the system (only allowed by another admin). ` + "`" + `Expects a JSON body containing username, email, and password. Returns the created account object on success.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admins"
+                ],
+                "summary": "Register a new admin account",
+                "parameters": [
+                    {
+                        "description": "Register user request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RegisterUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Invalid Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "409": {
+                        "description": "Error: Email or Username already exists",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/books": {
+            "get": {
+                "description": "Retrieves all books with pagination.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "books"
+                ],
+                "summary": "Get all books",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.PaginatedBooksResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Invalid or missing id",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Book not found",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -542,7 +654,170 @@ const docTemplate = `{
                 }
             }
         },
+        "/user-books/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Removes the user-book entry entirely.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_books"
+                ],
+                "summary": "Delete a book from a user's shelf",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "UserBook ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted successfully"
+                    },
+                    "400": {
+                        "description": "Invalid ID",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates only the fields provided in the JSON request.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_books"
+                ],
+                "summary": "Partially update a user-book relationship",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "UserBook ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to update",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/store.UpdateUserBookRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.UserBook"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
+            "get": {
+                "description": "Retrieves the details of a user by their username.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get a user by username",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "johndoe",
+                        "description": "Username",
+                        "name": "username",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Invalid or missing username",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Error: User not found",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Registers a new user in the system. Expects a JSON body containing username, email, and password. Returns the created account object on success.",
                 "consumes": [
@@ -594,9 +869,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/{username}": {
+        "/users/{user_id}/books": {
             "get": {
-                "description": "Retrieves the details of a user by their username.",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieves the books for a given user. Optional ` + "`" + `status` + "`" + ` query parameter filters by reading status.",
                 "consumes": [
                     "application/json"
                 ],
@@ -604,34 +884,93 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "user_books"
                 ],
-                "summary": "Get a user by username",
+                "summary": "Get a user's books",
                 "parameters": [
                     {
                         "type": "string",
-                        "example": "johndoe",
-                        "description": "The username of the user",
-                        "name": "username",
-                        "in": "path",
-                        "required": true
+                        "description": "Filter by status (wishlist|reading|completed)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/store.User"
+                            "$ref": "#/definitions/api.UserBooksResponse"
                         }
                     },
                     "400": {
-                        "description": "Error: Invalid or missing username",
+                        "description": "Error: Invalid or missing id",
                         "schema": {
                             "$ref": "#/definitions/api.HTTPError"
                         }
                     },
-                    "404": {
-                        "description": "Error: User not found",
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Adds a book to a user's collection with a specified status.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_books"
+                ],
+                "summary": "Add a book to a user's collection",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Book ID",
+                        "name": "book_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status (wishlist|reading|completed)",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.UserBooksResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Invalid or missing id",
                         "schema": {
                             "$ref": "#/definitions/api.HTTPError"
                         }
@@ -715,6 +1054,29 @@ const docTemplate = `{
                 }
             }
         },
+        "api.PaginatedBooksResponse": {
+            "type": "object",
+            "properties": {
+                "books": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/store.Book"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total_items": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
         "api.PaginatedCommentsResponse": {
             "type": "object",
             "properties": {
@@ -752,6 +1114,23 @@ const docTemplate = `{
                 }
             }
         },
+        "api.UserBooksResponse": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "user_books": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/store.BasicUserBook"
+                    }
+                }
+            }
+        },
         "api.createTokenRequest": {
             "type": "object",
             "properties": {
@@ -760,6 +1139,26 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "store.BasicUserBook": {
+            "type": "object",
+            "properties": {
+                "book": {
+                    "$ref": "#/definitions/store.Book"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -864,6 +1263,24 @@ const docTemplate = `{
                 }
             }
         },
+        "store.UpdateUserBookRequest": {
+            "type": "object",
+            "properties": {
+                "completed_at": {
+                    "description": "pointer-to-pointer allows null explicitly",
+                    "type": "string"
+                },
+                "pages_read": {
+                    "type": "integer"
+                },
+                "percentage_read": {
+                    "type": "number"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "store.User": {
             "type": "object",
             "properties": {
@@ -881,6 +1298,45 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "store.UserBook": {
+            "type": "object",
+            "properties": {
+                "book": {
+                    "$ref": "#/definitions/store.Book"
+                },
+                "book_id": {
+                    "type": "integer"
+                },
+                "completed_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "pages_read": {
+                    "type": "integer"
+                },
+                "percentage_read": {
+                    "type": "number"
+                },
+                "progress_updated_at": {
+                    "type": "string"
+                },
+                "started_at": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "\"wishlist\", \"reading\", \"completed\"",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
