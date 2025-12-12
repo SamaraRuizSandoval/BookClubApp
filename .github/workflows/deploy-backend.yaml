@@ -57,6 +57,10 @@ jobs:
           docker push $REGISTRY/$IMAGE:${{ github.sha }}
           docker push $REGISTRY/$IMAGE:latest
 
+      - name: Compute short SHA
+        id: vars
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Update Azure Container App
         uses: azure/cli@v2
         with:
@@ -65,4 +69,4 @@ jobs:
               --name $CONTAINERAPP \
               --resource-group $RESOURCE_GROUP \
               --image $REGISTRY/$IMAGE:${{ github.sha }} \
-              --revision-suffix "sha-${{ github.sha }}"
+              --revision-suffix "sha-${SHORT_SHA}"
