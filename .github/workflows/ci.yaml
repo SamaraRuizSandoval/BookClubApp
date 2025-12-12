@@ -45,6 +45,7 @@ jobs:
       - name: Test + Coverage (Jest)
         run: npm run test:coverage -- --watch=false
         if: always()  # still collect coverage even if lint/format failed
+        working-directory: book-club-app
 
       - name: Upload coverage (frontend)
         if: always()
