@@ -26,7 +26,7 @@ import (
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @schemes        https
-// @host      bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.
+// @host      https://bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io/
 // @BasePath  /
 
 // @securityDefinitions.apikey BearerAuth
