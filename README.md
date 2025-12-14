@@ -42,10 +42,10 @@ docker compose up --build
 
 
 You can verify that the backend is running by navigating to:
-http://localhost:5000/health
+https://bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io/health
 
 The internal API documentation can be found using the following link:
-http://localhost:5000/swagger/index.html
+https://bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io/swagger/index.html
 
 
 ### 3. Building for Web
