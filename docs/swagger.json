@@ -1,4 +1,7 @@
 {
+    "schemes": [
+        "https"
+    ],
     "swagger": "2.0",
     "info": {
         "description": "The BookClubApp to manage, share, and comment your favorite books. The goal is to create a space where you can interact and express your ideas and though as you go through the chapters of the books you are reading.",
@@ -15,7 +18,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:5000",
+    "host": "bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io",
     "basePath": "/",
     "paths": {
         "/admins": {

@@ -1,0 +1,14 @@
+# Frontend
+cmd/
+book-club-app/
+package-lock.json
+package.json
+
+# Git / tooling
+.git
+.gitignore
+.vscode
+.idea
+
+# Docs / misc
+README.md

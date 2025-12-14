@@ -8,12 +8,12 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy all source code at once
+# Copy all source code
 COPY . .
 
-# --- Generate Swagger docs ---
-RUN go install github.com/swaggo/swag/cmd/swag@latest
-RUN swag init -g main.go -o internal/docs
+# Generate Swagger docs
+RUN go install github.com/swaggo/swag/cmd/swag@latest \
+ && swag init -g main.go
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux go build -o /book-club-app
