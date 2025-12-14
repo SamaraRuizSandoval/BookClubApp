@@ -19,7 +19,7 @@ func getEnv(key, fallback string) string {
 }
 
 func Open() (*sql.DB, error) {
-	host := getEnv("DB_HOST", "localhost")
+	host := getEnv("DB_HOST", "db")
 	user := getEnv("DB_USER", "postgres")
 	password := getEnv("DB_PASSWORD", "postgres")
 	dbname := getEnv("DB_NAME", "postgres")
