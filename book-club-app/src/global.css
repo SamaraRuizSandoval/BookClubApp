@@ -1,0 +1,10 @@
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+ion-button.primary-button {
+  margin-top: 20px;
+}
