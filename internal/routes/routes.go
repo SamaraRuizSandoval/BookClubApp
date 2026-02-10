@@ -14,8 +14,9 @@ import (
 func SetupRouter(app *app.Application) *gin.Engine {
 	r := gin.Default()
 
+	//"http://localhost:5173"
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowOrigins:     []string{"https://zealous-wave-0844b9e0f.2.azurestaticapps.net"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
