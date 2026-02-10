@@ -210,3 +210,29 @@ func (uh *UserHandler) RegisterAdminAccount(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, newUser)
 }
+
+// GetMe godoc
+// @Summary      Get current user details
+// @Description  Gets the details of the current user. Returns the user object on success.
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {object} store.User
+// @Failure      500 {object} HTTPError "Error: Internal server error"
+// @Router       /me [get]
+func (uh *UserHandler) GetMe(ctx *gin.Context) {
+	user, exists := ctx.Get("user")
+	if !exists {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "user not found in context"})
+		return
+	}
+
+	userObj, ok := user.(*store.User)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "invalid user object in context"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, userObj)
+}

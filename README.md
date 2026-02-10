@@ -2,6 +2,9 @@
 
 A web application to manage, share, and comment your favorite books. The goal is to create a space where you can interact and express your ideas and though as you go through the chapters of the books you are reading. 
 
+Our link to the backend API documentation
+https://bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io/swagger/index.html
+
 ---
 
 ## 🚀 Features
@@ -42,10 +45,10 @@ docker compose up --build
 
 
 You can verify that the backend is running by navigating to:
-https://bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io/health
+http://localhost:5000/health
 
 The internal API documentation can be found using the following link:
-https://bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io/swagger/index.html
+http://localhost:5000/swagger/index.html
 
 
 ### 3. Building for Web

@@ -16,7 +16,7 @@ func SetupRouter(app *app.Application) *gin.Engine {
 
 	//"http://localhost:5173"
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://zealous-wave-0844b9e0f.2.azurestaticapps.net"},
+		AllowOrigins:     []string{"http://localhost:5173", "https://zealous-wave-0844b9e0f.2.azurestaticapps.net"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -36,6 +36,7 @@ func SetupRouter(app *app.Application) *gin.Engine {
 	auth := r.Group("/")
 	auth.Use(app.Middleware.AuthMiddleware(), app.Middleware.RequireUser())
 	{
+		auth.GET("/me", app.UserHandler.GetMe)
 		auth.PUT("/books/:id", app.BookHandler.HandleUpdateBookByID)
 		auth.DELETE("/books/:id", app.BookHandler.HandleDeleteBookByID)
 
