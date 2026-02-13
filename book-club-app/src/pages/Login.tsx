@@ -16,7 +16,6 @@ import api from '../api/axios';
 import { AuthTokenResponse } from '../types/auth';
 import { User } from '../types/user';
 
-
 type LoginProps = {
   onLoginSuccess: (authToken: AuthTokenResponse, user: User) => void;
 };
