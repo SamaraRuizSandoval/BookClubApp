@@ -1,12 +1,14 @@
 import { IonApp, IonSplitPane, IonRouterOutlet } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 
 import { LeftMenu } from './components/LeftMenu';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { Login } from './pages/Login';
 import { Page } from './pages/Page';
 import { Register } from './pages/Register';
+import { AuthState } from './types/auth';
 import {
   ReadingSection,
   WishlistSection,
@@ -15,38 +17,102 @@ import {
 import './global.css';
 
 export default function App() {
+  const [auth, setAuth] = useState<AuthState>({
+    token: null,
+    user: null,
+    isAuthenticated: false,
+  });
+
+  useEffect(() => {
+    console.log('AUTH STATE UPDATED:', auth);
+  }, [auth]);
+
   return (
     <IonApp>
       <IonReactRouter>
         <IonRouterOutlet>
           <Switch>
-            {/* 🔓 AUTH ROUTES */}
-            <Route path="/login" component={Login} exact />
+            {/* 🏠 LANDING */}
+            <Route
+              exact
+              path="/"
+              render={() =>
+                auth.isAuthenticated ? (
+                  auth.user?.role === 'admin' ? (
+                    <Redirect to="/dashboard" />
+                  ) : (
+                    <Redirect to="/home" />
+                  )
+                ) : (
+                  <Redirect to="/login" />
+                )
+              }
+            />
+
+            {/* 🔓 LOGIN */}
+            <Route
+              path="/login"
+              render={() =>
+                auth.isAuthenticated ? (
+                  <Redirect to="/" />
+                ) : (
+                  <Login
+                    onLoginSuccess={(token, user) =>
+                      setAuth({
+                        token,
+                        user,
+                        isAuthenticated: true,
+                      })
+                    }
+                  />
+                )
+              }
+            />
+
             <Route path="/register" component={Register} exact />
 
-            {/* 🔐 APP ROUTES */}
-            <Route>
-              <IonSplitPane when="md" contentId="main-content">
-                <LeftMenu />
-                <IonRouterOutlet id="main-content">
-                  <Switch>
-                    <Route
-                      path="/home"
-                      component={() => <Page title="Home" />}
-                    />
-                    <Route path="/reading" component={ReadingSection} />
-                    <Route path="/wishlist" component={WishlistSection} />
-                    <Route path="/completed" component={CompletedSection} />
-                    <Route
-                      path="/settings"
-                      component={() => <Page title="Settings" />}
-                    />
-                    <Redirect exact from="/" to="/home" />
-                    <Route component={() => <Page title="Not Found" />} />
-                  </Switch>
-                </IonRouterOutlet>
-              </IonSplitPane>
-            </Route>
+            {/* 🔐 ADMIN DASHBOARD */}
+            <Route
+              path="/dashboard"
+              render={() =>
+                auth.isAuthenticated && auth.user?.role === 'admin' ? (
+                  <AdminDashboard />
+                ) : (
+                  <Redirect to="/login" />
+                )
+              }
+            />
+
+            {/* 🔐 USER LAYOUT (SplitPane with LeftMenu) */}
+            <Route
+              path="/home"
+              render={() =>
+                auth.isAuthenticated && auth.user?.role === 'user' ? (
+                  <IonSplitPane when="md" contentId="main-content">
+                    <LeftMenu />
+                    <IonRouterOutlet id="main-content">
+                      <Switch>
+                        <Route
+                          exact
+                          path="/home"
+                          component={() => <Page title="Home" />}
+                        />
+                        <Route path="/reading" component={ReadingSection} />
+                        <Route path="/wishlist" component={WishlistSection} />
+                        <Route path="/completed" component={CompletedSection} />
+                        <Route
+                          path="/settings"
+                          component={() => <Page title="Settings" />}
+                        />
+                        <Route component={() => <Page title="Not Found" />} />
+                      </Switch>
+                    </IonRouterOutlet>
+                  </IonSplitPane>
+                ) : (
+                  <Redirect to="/login" />
+                )
+              }
+            />
           </Switch>
         </IonRouterOutlet>
       </IonReactRouter>
