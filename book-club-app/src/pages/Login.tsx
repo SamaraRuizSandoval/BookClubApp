@@ -23,9 +23,12 @@ type LoginProps = {
 export function Login(props: LoginProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const history = useHistory();
 
   const handleLogin = async () => {
+    setErrorMessage(null); // Clear previous error message
+
     try {
       const authResponse = await api.post<AuthTokenResponse>(
         '/tokens/authentication',
@@ -37,7 +40,6 @@ export function Login(props: LoginProps) {
 
       const authToken = authResponse.data;
       const { token } = authResponse.data.auth_token;
-      console.log('Received token:', token);
 
       localStorage.setItem('authToken', token);
 
@@ -46,13 +48,14 @@ export function Login(props: LoginProps) {
           Authorization: `Bearer ${token}`,
         },
       });
+
       const userData = meResponse.data;
-      console.log('User data:', userData);
 
       props.onLoginSuccess(authToken, userData);
       history.replace('/');
     } catch (error) {
       console.error('Error logging in:', error);
+      setErrorMessage('Login failed. Invalid username or password.');
     }
   };
 
@@ -66,6 +69,9 @@ export function Login(props: LoginProps) {
             </IonCardHeader>
 
             <IonCardContent>
+              {errorMessage && (
+                <div className="error-message">{errorMessage}</div>
+              )}
               <IonItem>
                 <IonInput
                   placeholder="Username"
@@ -91,6 +97,17 @@ export function Login(props: LoginProps) {
                 onClick={handleLogin}
               >
                 Login with username
+              </IonButton>
+
+              <IonButton
+                color="black"
+                fill="clear"
+                size="default"
+                expand="full"
+                className="secondary-button"
+                onClick={() => history.push('/register')}
+              >
+                Don't have an account? Register
               </IonButton>
             </IonCardContent>
           </IonCard>
