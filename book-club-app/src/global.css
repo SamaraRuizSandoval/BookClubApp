@@ -23,3 +23,8 @@ ion-button.secondary-button {
   margin-bottom: 16px;
   font-size: 14px;
 }
+
+ion-avatar {
+  width: 45px;
+  height: 45px;
+}
