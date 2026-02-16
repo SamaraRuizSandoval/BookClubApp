@@ -9,21 +9,20 @@ import {
   IonInput,
   IonButton,
 } from '@ionic/react';
+import { useIonRouter } from '@ionic/react';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import api from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 import { AuthTokenResponse } from '../types/auth';
 import { User } from '../types/user';
 
-type LoginProps = {
-  onLoginSuccess: (authToken: string, user: User) => void;
-};
-
-export function Login(props: LoginProps) {
+export function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { login } = useAuth();
   const history = useHistory();
 
   const handleLogin = async () => {
@@ -42,16 +41,18 @@ export function Login(props: LoginProps) {
 
       localStorage.setItem('authToken', authToken);
 
-      const meResponse = await api.get<User>('/me', {
+      const userData = await api.get<User>('/me', {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
 
-      const userData = meResponse.data;
-
-      props.onLoginSuccess(authToken, userData);
-      history.replace('/');
+      login(authToken, userData);
+      if (userData.data.role === 'admin') {
+        history.replace('/dashboard');
+      } else {
+        history.replace('/home');
+      }
     } catch (error) {
       console.error('Error logging in:', error);
       setErrorMessage('Login failed. Invalid username or password.');

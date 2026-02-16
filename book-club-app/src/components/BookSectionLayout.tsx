@@ -50,11 +50,6 @@ export function BooksSectionLayout({ sectionKey, sectionTitle }: Props) {
         type="overlay"
         menuId={menuId}
       >
-        <IonHeader>
-          <IonToolbar>
-            <IonTitle>{sectionTitle}</IonTitle>
-          </IonToolbar>
-        </IonHeader>
         <IonContent>
           <BooksMenuList baseUrl={url} books={books} />
         </IonContent>
