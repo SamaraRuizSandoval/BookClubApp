@@ -15,7 +15,6 @@ import { useState } from 'react';
 import profilePic from '../assets/images/person-circle.svg';
 import { useAuth } from '../context/AuthContext';
 
-
 export function UpperNavigation() {
   const [showOptions, setShowOptions] = useState(false);
   const [event, setEvent] = useState<any>(null);
