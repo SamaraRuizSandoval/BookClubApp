@@ -1,7 +1,7 @@
 import { IonApp, IonSplitPane, IonRouterOutlet } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import React, { useEffect, useState } from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
 
 import { LeftMenu } from './components/LeftMenu';
 import { AdminDashboard } from './pages/AdminDashboard';
@@ -17,15 +17,49 @@ import {
 import './global.css';
 
 export default function App() {
+  const [initializing, setInitializing] = useState(true);
   const [auth, setAuth] = useState<AuthState>({
-    token: null,
+    token: '',
     user: null,
     isAuthenticated: false,
   });
 
   useEffect(() => {
-    console.log('AUTH STATE UPDATED:', auth);
-  }, [auth]);
+    const storedToken = localStorage.getItem('authToken');
+
+    if (!storedToken) {
+      setInitializing(false);
+      return;
+    }
+
+    console.log('Found token in localStorage:', storedToken);
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/me`, {
+      headers: {
+        Authorization: `Bearer ${storedToken}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        return res.json();
+      })
+      .then((user) => {
+        setAuth({
+          token: storedToken,
+          user: user,
+          isAuthenticated: true,
+        });
+      })
+      .catch(() => {
+        localStorage.removeItem('token');
+      })
+      .finally(() => setInitializing(false));
+  }, []);
+
+  if (initializing) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <IonApp>

@@ -17,7 +17,7 @@ import { AuthTokenResponse } from '../types/auth';
 import { User } from '../types/user';
 
 type LoginProps = {
-  onLoginSuccess: (authToken: AuthTokenResponse, user: User) => void;
+  onLoginSuccess: (authToken: string, user: User) => void;
 };
 
 export function Login(props: LoginProps) {
@@ -38,14 +38,13 @@ export function Login(props: LoginProps) {
         },
       );
 
-      const authToken = authResponse.data;
-      const { token } = authResponse.data.auth_token;
+      const authToken = authResponse.data.auth_token.token;
 
-      localStorage.setItem('authToken', token);
+      localStorage.setItem('authToken', authToken);
 
       const meResponse = await api.get<User>('/me', {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authToken}`,
         },
       });
 

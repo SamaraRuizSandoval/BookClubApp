@@ -1,7 +1,7 @@
 import { User } from './user';
 
 export type AuthState = {
-  token: AuthTokenResponse | null;
+  token: string;
   user: User | null;
   isAuthenticated: boolean;
 };
