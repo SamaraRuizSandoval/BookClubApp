@@ -13,15 +13,17 @@ import {
 import { useState } from 'react';
 
 import profilePic from '../assets/images/person-circle.svg';
+import { useAuth } from '../context/AuthContext';
+
 
 export function UpperNavigation() {
   const [showOptions, setShowOptions] = useState(false);
   const [event, setEvent] = useState<any>(null);
-  //const { logout } = useAuth();
+  const { logout } = useAuth();
   const router = useIonRouter();
 
   const handleLogout = () => {
-    //logout();
+    logout();
     router.push('/login', 'root', 'replace');
   };
 
@@ -29,7 +31,6 @@ export function UpperNavigation() {
     <>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Hola</IonTitle>
           <IonButtons slot="end">
             <IonButton
               fill="clear"
