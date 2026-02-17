@@ -1,9 +1,10 @@
 import { IonApp, IonSplitPane, IonRouterOutlet } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 
 import { LeftMenu } from './components/LeftMenu';
+import { useAuth } from './context/AuthContext';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { Login } from './pages/Login';
 import { Page } from './pages/Page';
 import { Register } from './pages/Register';
@@ -15,16 +16,48 @@ import {
 import './global.css';
 
 export default function App() {
+  const { auth, initializing } = useAuth();
+
+  if (initializing) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <IonApp>
       <IonReactRouter>
         <IonRouterOutlet>
           <Switch>
-            {/* 🔓 AUTH ROUTES */}
-            <Route path="/login" component={Login} exact />
+            {/* 🏠 LANDING */}
+            <Route
+              exact
+              path="/"
+              render={() =>
+                auth.isAuthenticated ? (
+                  auth.user?.role === 'admin' ? (
+                    <Redirect to="/dashboard" />
+                  ) : (
+                    <Redirect to="/home" />
+                  )
+                ) : (
+                  <Redirect to="/login" />
+                )
+              }
+            />
+
+            {/* 🔓 LOGIN */}
+            <Route
+              path="/login"
+              render={() =>
+                auth.isAuthenticated ? <Redirect to="/" /> : <Login />
+              }
+            />
+
             <Route path="/register" component={Register} exact />
 
-            {/* 🔐 APP ROUTES */}
+            {/* 🔐 ADMIN DASHBOARD */}
+            <Route path="/dashboard" component={AdminDashboard} exact />
+
+            {/* 🔐 USER LAYOUT (SplitPane with LeftMenu) */}
             <Route>
               <IonSplitPane when="md" contentId="main-content">
                 <LeftMenu />

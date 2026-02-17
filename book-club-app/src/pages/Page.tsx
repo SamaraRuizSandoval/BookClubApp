@@ -9,17 +9,14 @@ import {
 } from '@ionic/react';
 import { useLocation } from 'react-router-dom';
 
+import { UpperNavigation } from '../components/UpperNavigation';
+
 export function Page({ title }: { title: string }) {
   const location = useLocation();
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonMenuButton />
-          </IonButtons>
-          <IonTitle>{title}</IonTitle>
-        </IonToolbar>
+        <UpperNavigation />
       </IonHeader>
       <IonContent className="ion-padding">
         <h1 className="text-2xl font-semibold">{title}</h1>

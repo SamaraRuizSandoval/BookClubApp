@@ -36,6 +36,7 @@ func SetupRouter(app *app.Application) *gin.Engine {
 	auth := r.Group("/")
 	auth.Use(app.Middleware.AuthMiddleware(), app.Middleware.RequireUser())
 	{
+		auth.GET("/me", app.UserHandler.GetMe)
 		auth.PUT("/books/:id", app.BookHandler.HandleUpdateBookByID)
 		auth.DELETE("/books/:id", app.BookHandler.HandleDeleteBookByID)
 

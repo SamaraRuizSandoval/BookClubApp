@@ -10,6 +10,7 @@ import {
   IonButton,
 } from '@ionic/react';
 import { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import api from '../api/axios';
 
@@ -17,6 +18,7 @@ export function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const history = useHistory();
 
   const handleRegister = async () => {
     try {
@@ -74,6 +76,16 @@ export function Register() {
                 onClick={handleRegister}
               >
                 Sign up with username
+              </IonButton>
+              <IonButton
+                color="black"
+                fill="clear"
+                size="default"
+                expand="full"
+                className="secondary-button"
+                onClick={() => history.push('/login')}
+              >
+                Already have an account? Login
               </IonButton>
             </IonCardContent>
           </IonCard>
