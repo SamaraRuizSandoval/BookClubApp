@@ -9,7 +9,6 @@ import {
   IonInput,
   IonButton,
 } from '@ionic/react';
-import { useIonRouter } from '@ionic/react';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 

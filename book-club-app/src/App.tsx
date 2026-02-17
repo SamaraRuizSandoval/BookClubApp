@@ -1,7 +1,6 @@
 import { IonApp, IonSplitPane, IonRouterOutlet } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import React, { useEffect, useState } from 'react';
-import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 
 import { LeftMenu } from './components/LeftMenu';
 import { useAuth } from './context/AuthContext';
@@ -9,7 +8,6 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { Login } from './pages/Login';
 import { Page } from './pages/Page';
 import { Register } from './pages/Register';
-import { AuthState } from './types/auth';
 import {
   ReadingSection,
   WishlistSection,
