@@ -31,11 +31,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/me`, {
-      headers: {
-        Authorization: `Bearer ${storedToken}`,
+    fetch(
+      'https://bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io/me',
+      {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
       },
-    })
+    )
       .then((res) => {
         if (!res.ok) throw new Error('Invalid token');
         return res.json();
