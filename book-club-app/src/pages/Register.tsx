@@ -8,6 +8,7 @@ import {
   IonItem,
   IonInput,
   IonButton,
+  IonLabel,
 } from '@ionic/react';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -18,19 +19,74 @@ export function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [emailIsValid, setEmailIsValid] = useState<boolean>();
+  const [emailIsTouched, setEmailTouched] = useState(false);
+  const [passwordsMatch, setPasswordsMatch] = useState<boolean>();
+  const [passwordIsTouched, setPasswordTouched] = useState(false);
   const history = useHistory();
 
+  const isEmailValid = (email: string) => {
+    return email.match(
+      /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+    );
+  };
+
+  const validateEmail = (value: string) => {
+    if (value === '') {
+      setEmailIsValid(undefined);
+      return;
+    }
+
+    setEmailIsValid(isEmailValid(value) != null);
+  };
+
+  const markEmailTouched = () => {
+    setEmailTouched(true);
+  };
+
+  const validatePasswords = (pass: string, confirm: string) => {
+    if (confirm === '') {
+      setPasswordsMatch(undefined);
+      return;
+    }
+
+    setPasswordsMatch(pass === confirm);
+  };
+
+  const markPasswordTouched = () => {
+    setPasswordTouched(true);
+  };
+
   const handleRegister = async () => {
+    if (!emailIsValid || !passwordsMatch) {
+      return;
+    }
+
     try {
+      setUsernameError(null); // clear previous error
+
       const response = await api.post('/users', {
         username,
         email,
         password,
       });
+
+      history.replace('/login', {
+        message: 'Account created successfully!',
+      });
       console.log('User registered:', response);
-    } catch (error) {
-      console.error('Error registering user:', error);
+    } catch (error: any) {
+      if (error.response?.data?.error === 'username already taken') {
+        setUsernameError('Username is already taken');
+      } else {
+        console.error('Error registering user:', error);
+      }
     }
+
+    //history.replace('/login');
   };
 
   return (
@@ -43,31 +99,63 @@ export function Register() {
             </IonCardHeader>
 
             <IonCardContent>
-              <IonItem>
+              {usernameError && (
+                <div className="error-message">{usernameError}</div>
+              )}
+              <IonItem lines="none">
                 <IonInput
                   placeholder="Username"
                   type="text"
+                  errorText="Invalid email"
                   value={username}
                   onIonInput={(e) => setUsername(e.detail.value!)}
                 />
               </IonItem>
-              <IonItem>
+              <IonItem lines="none">
                 <IonInput
+                  className={`${emailIsValid && 'ion-valid'} ${emailIsValid === false && 'ion-invalid'} ${emailIsTouched && 'ion-touched'}`}
                   placeholder="Email"
                   type="email"
+                  errorText="Invalid email"
                   value={email}
-                  onIonInput={(e) => setEmail(e.detail.value!)}
+                  onIonInput={(e) => {
+                    const value = e.detail.value!;
+                    setEmail(value);
+                    validateEmail(value);
+                  }}
+                  onIonBlur={() => {
+                    markEmailTouched();
+                  }}
                 />
               </IonItem>
-              <IonItem>
+              <IonItem lines="none">
                 <IonInput
+                  className={`${passwordsMatch === true && 'ion-valid'} ${passwordsMatch === false && 'ion-invalid'} ${passwordIsTouched && 'ion-touched'}`}
                   placeholder="Password"
                   type="password"
                   value={password}
+                  errorText="Passwords don't match"
                   onIonInput={(e) => setPassword(e.detail.value!)}
+                  onIonBlur={() => {
+                    markPasswordTouched();
+                  }}
+                />
+              </IonItem>
+              <IonItem lines="none">
+                <IonInput
+                  placeholder="Confirm password"
+                  type="password"
+                  errorText="Passwords don't match"
+                  value={confirmPassword}
+                  onIonInput={(e) => {
+                    const confirmPass = e.detail.value!;
+                    setConfirmPassword(confirmPass);
+                    validatePasswords(password, confirmPass);
+                  }}
                 />
               </IonItem>
               <IonButton
+                disabled={!emailIsValid || !passwordsMatch}
                 color="primary"
                 shape="round"
                 size="default"
