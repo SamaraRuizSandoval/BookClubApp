@@ -8,14 +8,19 @@ import {
   IonItem,
   IonInput,
   IonButton,
+  IonToast,
 } from '@ionic/react';
 import { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { AuthTokenResponse } from '../types/auth';
 import { User } from '../types/user';
+
+type LoginLocationState = {
+  message?: string;
+};
 
 export function Login() {
   const [username, setUsername] = useState('');
@@ -23,6 +28,11 @@ export function Login() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { login } = useAuth();
   const history = useHistory();
+
+  const location = useLocation<LoginLocationState>();
+  const successMessage = (location.state as LoginLocationState | undefined)
+    ?.message;
+  const [showToast, setShowToast] = useState(!!successMessage);
 
   const handleLogin = async () => {
     setErrorMessage(null); // Clear previous error message
@@ -60,6 +70,14 @@ export function Login() {
 
   return (
     <IonPage>
+      <IonToast
+        isOpen={showToast}
+        message={successMessage}
+        position="top"
+        duration={3000}
+        color="success"
+        onDidDismiss={() => setShowToast(false)}
+      />
       <IonContent>
         <div className="flex-center">
           <IonCard>
