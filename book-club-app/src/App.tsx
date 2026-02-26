@@ -4,10 +4,10 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 
 import { LeftMenu } from './components/LeftMenu';
 import { useAuth } from './context/AuthContext';
-import { AdminDashboard } from './pages/AdminDashboard';
 import { Login } from './pages/Login';
 import { Page } from './pages/Page';
 import { Register } from './pages/Register';
+import { AdminLayout } from './pages/admin/AdminLayout';
 import {
   ReadingSection,
   WishlistSection,
@@ -34,7 +34,7 @@ export default function App() {
               render={() =>
                 auth.isAuthenticated ? (
                   auth.user?.role === 'admin' ? (
-                    <Redirect to="/dashboard" />
+                    <Redirect to="/admin" />
                   ) : (
                     <Redirect to="/home" />
                   )
@@ -54,8 +54,8 @@ export default function App() {
 
             <Route path="/register" component={Register} exact />
 
-            {/* 🔐 ADMIN DASHBOARD */}
-            <Route path="/dashboard" component={AdminDashboard} exact />
+            {/* 🔐 ADMIN LAYOUT */}
+            <Route path="/admin" component={AdminLayout} />
 
             {/* 🔐 USER LAYOUT (SplitPane with LeftMenu) */}
             <Route>

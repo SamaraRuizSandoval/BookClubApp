@@ -62,7 +62,7 @@ export function Login() {
       login(authToken, userData);
       setIsLoading(false);
       if (userData.data.role === 'admin') {
-        history.replace('/dashboard');
+        history.replace('/admin');
       } else {
         history.replace('/home');
       }

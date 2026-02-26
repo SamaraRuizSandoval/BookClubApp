@@ -9,6 +9,7 @@ import {
   IonList,
   IonItem,
   useIonRouter,
+  IonMenuButton,
 } from '@ionic/react';
 import { useState } from 'react';
 
@@ -30,6 +31,9 @@ export function UpperNavigation() {
     <>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonMenuButton></IonMenuButton>
+          </IonButtons>
           <IonButtons slot="end">
             <IonButton
               fill="clear"
