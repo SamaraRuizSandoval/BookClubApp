@@ -28,6 +28,7 @@ export function Login() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { login } = useAuth();
   const history = useHistory();
+  const [isLoading, setIsLoading] = useState(false);
 
   const location = useLocation<LoginLocationState>();
   const successMessage = (location.state as LoginLocationState | undefined)
@@ -38,6 +39,8 @@ export function Login() {
     setErrorMessage(null); // Clear previous error message
 
     try {
+      setIsLoading(true);
+
       const authResponse = await api.post<AuthTokenResponse>(
         '/tokens/authentication',
         {
@@ -57,6 +60,7 @@ export function Login() {
       });
 
       login(authToken, userData);
+      setIsLoading(false);
       if (userData.data.role === 'admin') {
         history.replace('/dashboard');
       } else {
@@ -65,6 +69,7 @@ export function Login() {
     } catch (error) {
       console.error('Error logging in:', error);
       setErrorMessage('Login failed. Invalid username or password.');
+      setIsLoading(false);
     }
   };
 
@@ -93,6 +98,7 @@ export function Login() {
                 <IonInput
                   placeholder="Username"
                   type="text"
+                  disabled={isLoading}
                   value={username}
                   onIonInput={(e) => setUsername(e.detail.value!)}
                 />
@@ -101,11 +107,13 @@ export function Login() {
                 <IonInput
                   placeholder="Password"
                   type="password"
+                  disabled={isLoading}
                   value={password}
                   onIonInput={(e) => setPassword(e.detail.value!)}
                 />
               </IonItem>
               <IonButton
+                disabled={isLoading}
                 color="primary"
                 shape="round"
                 size="default"
@@ -117,6 +125,7 @@ export function Login() {
               </IonButton>
 
               <IonButton
+                disabled={isLoading}
                 color="black"
                 fill="clear"
                 size="default"
