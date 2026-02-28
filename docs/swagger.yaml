@@ -244,7 +244,7 @@ definitions:
     - RoleAdmin
   tokens.Token:
     properties:
-      expriy:
+      expiry:
         type: string
       token:
         type: string
@@ -252,7 +252,7 @@ definitions:
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
-host: localhost:5000
+host: bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io
 info:
   contact:
     email: support@swagger.io
@@ -306,6 +306,36 @@ paths:
       summary: Register a new admin account
       tags:
       - admins
+  /api/books:
+    get:
+      consumes:
+      - application/json
+      description: Searches for books in the Google Books API.
+      parameters:
+      - description: Search query (e.g. title, author)
+        in: query
+        name: query
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.UserBooksResponse'
+        "400":
+          description: 'Error: Invalid or missing id'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Search Google Books
+      tags:
+      - google_books
   /books:
     get:
       consumes:
@@ -924,7 +954,7 @@ paths:
       tags:
       - user_books
 schemes:
-- http
+- https
 securityDefinitions:
   BearerAuth:
     description: Type "Bearer" followed by a space and your token.

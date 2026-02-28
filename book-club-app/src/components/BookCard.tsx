@@ -15,7 +15,7 @@ type BookCardProps = {
 
 export function BookCard({ book }: BookCardProps) {
   return (
-    <IonCard>
+    <IonCard className="book-card">
       <div className="flex-center">
         <IonImg
           className="book-cover"

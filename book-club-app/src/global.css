@@ -14,7 +14,7 @@ ion-button.secondary-button {
   color: #4a4c50; /* White text color */
 }
 
-ion-card {
+ion-card.book-card {
   margin: 12px;
   padding: 10px;
   border-radius: 8px;

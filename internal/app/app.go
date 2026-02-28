@@ -16,14 +16,15 @@ import (
 
 // Resourses that we can use through our application
 type Application struct {
-	Logger           *log.Logger
-	DB               *sql.DB
-	Middleware       middleware.UserMiddleware
-	BookHandler      *api.BookHandler
-	UserHandler      *api.UserHandler
-	TokenHandler     *api.TokenHandler
-	UserBooksHandler *api.UserBooksHandler
-	CommentHandler   *api.ChapterCommentHandler
+	Logger               *log.Logger
+	DB                   *sql.DB
+	Middleware           middleware.UserMiddleware
+	BookHandler          *api.BookHandler
+	UserHandler          *api.UserHandler
+	TokenHandler         *api.TokenHandler
+	UserBooksHandler     *api.UserBooksHandler
+	CommentHandler       *api.ChapterCommentHandler
+	GoogleBookAPIHandler *api.GoogleBookApiHandler
 }
 
 func NewApplication() (*Application, error) {
@@ -43,6 +44,7 @@ func NewApplication() (*Application, error) {
 	chapterStore := store.NewPostgresChapterStore(pgDB)
 	userBooksStore := store.NewUserBooksStore(pgDB)
 	commentStore := store.NewPostgresChapterCommentStore(pgDB)
+	googleApiStore := store.NewGoogleBooksStore()
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 	middlewareHandler := middleware.UserMiddleware{UserStore: userStore}
@@ -52,16 +54,18 @@ func NewApplication() (*Application, error) {
 	tokenHandler := api.NewTokenHandler(tokenStore, userStore, logger)
 	userBooksHandler := api.NewUserBooksHandler(userBooksStore, logger)
 	commentHandler := api.NewChapterCommentHandler(commentStore, chapterStore, logger)
+	googleBookApiHandler := api.NewGoogleBookApiHandler(googleApiStore, logger)
 
 	app := &Application{
-		Logger:           logger,
-		DB:               pgDB,
-		Middleware:       middlewareHandler,
-		BookHandler:      bookHandler,
-		UserHandler:      userHandler,
-		TokenHandler:     tokenHandler,
-		UserBooksHandler: userBooksHandler,
-		CommentHandler:   commentHandler,
+		Logger:               logger,
+		DB:                   pgDB,
+		Middleware:           middlewareHandler,
+		BookHandler:          bookHandler,
+		UserHandler:          userHandler,
+		TokenHandler:         tokenHandler,
+		UserBooksHandler:     userBooksHandler,
+		CommentHandler:       commentHandler,
+		GoogleBookAPIHandler: googleBookApiHandler,
 	}
 
 	return app, nil

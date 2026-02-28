@@ -47,6 +47,7 @@ func SetupRouter(app *app.Application) *gin.Engine {
 		auth.GET("/users/:user_id/books", app.UserBooksHandler.HandleGetUserBooks)
 		auth.PATCH("/user-books/:id", app.UserBooksHandler.HandleUpdateUserBook)
 		auth.DELETE("/user-books/:id", app.UserBooksHandler.HandleDeleteUserBook)
+		auth.GET("/api/books", app.GoogleBookAPIHandler.HandleSearchGoogleBooks)
 	}
 
 	r.GET("/books/:id", app.BookHandler.HandleGetBookByID)

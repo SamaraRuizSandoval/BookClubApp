@@ -81,6 +81,54 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/books": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Searches for books in the Google Books API.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "google_books"
+                ],
+                "summary": "Search Google Books",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query (e.g. title, author)",
+                        "name": "query",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.UserBooksResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Invalid or missing id",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/books": {
             "get": {
                 "description": "Retrieves all books with pagination.",
@@ -1388,7 +1436,7 @@ const docTemplate = `{
         "tokens.Token": {
             "type": "object",
             "properties": {
-                "expriy": {
+                "expiry": {
                     "type": "string"
                 },
                 "token": {
@@ -1414,9 +1462,9 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:5000",
+	Host:             "bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io",
 	BasePath:         "/",
-	Schemes:          []string{"http"},
+	Schemes:          []string{"https"},
 	Title:            "BookClubApp",
 	Description:      "The BookClubApp to manage, share, and comment your favorite books. The goal is to create a space where you can interact and express your ideas and though as you go through the chapters of the books you are reading.",
 	InfoInstanceName: "swagger",
