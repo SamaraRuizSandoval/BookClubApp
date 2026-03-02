@@ -26,7 +26,12 @@ export function BookCard({ book }: BookCardProps) {
 
       <IonCardHeader>
         <IonCardTitle className="book-card">{book.title}</IonCardTitle>
-        <IonCardSubtitle> {book.authors.join(', ')} </IonCardSubtitle>
+        <IonCardSubtitle>
+          {' '}
+          {book.authors?.length
+            ? book.authors.join(', ')
+            : 'Unknown Author'}{' '}
+        </IonCardSubtitle>
       </IonCardHeader>
 
       <IonCardContent>{book.publisher}</IonCardContent>

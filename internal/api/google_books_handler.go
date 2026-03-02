@@ -33,14 +33,14 @@ type GoogleBooksResponse struct {
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth
-// @Param        query query string false "Search query (e.g. title, author)"
+// @Param        q query string false "Search query (e.g. title, author)"
 // @Success      200 {object} []store.Book "Successful response with list of books"
 // @Failure      400 {object} HTTPError "Error: Invalid or missing id"
 // @Failure      500 {object} HTTPError "Error: Internal server error"
 // @Router       /api/books [get]
 func (gbh *GoogleBookApiHandler) HandleSearchGoogleBooks(ctx *gin.Context) {
 	newBooks := make([]store.Book, 0)
-	query := ctx.Query("query")
+	query := ctx.Query("q")
 	if query == "" {
 		gbh.logger.Println("ERROR: missing search query")
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -59,7 +59,6 @@ func (gbh *GoogleBookApiHandler) HandleSearchGoogleBooks(ctx *gin.Context) {
 	}
 
 	for index, book := range books {
-
 		mapped, err := mapGoogleToBook(book, index)
 		if err != nil {
 			gbh.logger.Printf("ERROR: mapping google book to internal book: %v", err)
@@ -69,7 +68,7 @@ func (gbh *GoogleBookApiHandler) HandleSearchGoogleBooks(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"items": newBooks,
+		"books": newBooks,
 	})
 }
 

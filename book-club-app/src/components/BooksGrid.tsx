@@ -8,6 +8,7 @@ type BookGridProps = {
   books: Book[];
 };
 export function BookGrid({ books }: BookGridProps) {
+  console.log('Rendering BookGrid with books:', books);
   return (
     <IonGrid>
       <IonRow>

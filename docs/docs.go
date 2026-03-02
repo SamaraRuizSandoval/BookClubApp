@@ -103,15 +103,18 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Search query (e.g. title, author)",
-                        "name": "query",
+                        "name": "q",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successful response with list of books",
                         "schema": {
-                            "$ref": "#/definitions/api.UserBooksResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/store.Book"
+                            }
                         }
                     },
                     "400": {
@@ -1462,9 +1465,9 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io",
+	Host:             "localhost:5000",
 	BasePath:         "/",
-	Schemes:          []string{"https"},
+	Schemes:          []string{"http"},
 	Title:            "BookClubApp",
 	Description:      "The BookClubApp to manage, share, and comment your favorite books. The goal is to create a space where you can interact and express your ideas and though as you go through the chapters of the books you are reading.",
 	InfoInstanceName: "swagger",

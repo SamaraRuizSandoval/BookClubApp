@@ -252,7 +252,7 @@ definitions:
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
-host: bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io
+host: localhost:5000
 info:
   contact:
     email: support@swagger.io
@@ -314,15 +314,17 @@ paths:
       parameters:
       - description: Search query (e.g. title, author)
         in: query
-        name: query
+        name: q
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successful response with list of books
           schema:
-            $ref: '#/definitions/api.UserBooksResponse'
+            items:
+              $ref: '#/definitions/store.Book'
+            type: array
         "400":
           description: 'Error: Invalid or missing id'
           schema:
@@ -954,7 +956,7 @@ paths:
       tags:
       - user_books
 schemes:
-- https
+- http
 securityDefinitions:
   BearerAuth:
     description: Type "Bearer" followed by a space and your token.

@@ -13,12 +13,13 @@ import {
   IonIcon,
   IonSplitPane,
 } from '@ionic/react';
-import { bookOutline, peopleOutline, gridOutline } from 'ionicons/icons';
+import { bookOutline } from 'ionicons/icons';
 import { Route, Redirect, Switch } from 'react-router-dom';
 
 import { UpperNavigation } from '../../components/UpperNavigation';
 
 import { AdminBooks } from './AdminBooks';
+import { SearchGoogleBooks } from './books/SearchGoogleBooks';
 
 export function AdminLayout() {
   return (
@@ -49,9 +50,13 @@ export function AdminLayout() {
           <IonRouterOutlet>
             <Switch>
               <Route path="/admin/books" component={AdminBooks} exact />
+              <Route
+                path="/admin/search-google-books"
+                component={SearchGoogleBooks}
+                exact
+              />
               <Redirect exact from="/admin" to="/admin/books" />
             </Switch>
-            {/* <Route path="/admin/dashboard" component={AdminDashboard} exact /> */}
           </IonRouterOutlet>
         </IonPage>
       </IonSplitPane>

@@ -6,17 +6,21 @@ import {
   IonTitle,
   IonText,
   IonSpinner,
+  IonButton,
+  IonIcon,
 } from '@ionic/react';
+import { addOutline } from 'ionicons/icons';
 import { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import api from '../../api/axios';
 import { BookGrid } from '../../components/BooksGrid';
-import { AuthTokenResponse } from '../../types/auth';
 import { Book, BookResponse } from '../../types/book';
 
 export function AdminBooks() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
+  const history = useHistory();
 
   useEffect(() => {
     async function fetchBooks() {
@@ -30,9 +34,12 @@ export function AdminBooks() {
         setLoading(false);
       }
     }
-
     fetchBooks();
   }, []);
+
+  // TODO: We can add caching
+  // TODO: Add rate limiting
+  // TODO: Make this search paginated
   return (
     <IonPage>
       <IonHeader>
@@ -42,10 +49,19 @@ export function AdminBooks() {
       </IonHeader>
 
       <IonContent className="ion-padding">
-        <IonText>
-          <h2>Admin Books Section</h2>
-          {loading ? <IonSpinner /> : <BookGrid books={books} />}
-        </IonText>
+        <div className="admin-books-header">
+          <IonText>
+            <h2>Admin Books Section</h2>
+          </IonText>
+          <IonButton
+            shape="round"
+            className="float-right-button"
+            onClick={() => history.push('/admin/search-google-books')}
+          >
+            <IonIcon slot="icon-only" icon={addOutline}></IonIcon>
+          </IonButton>
+        </div>
+        {loading ? <IonSpinner /> : <BookGrid books={books} />}
       </IonContent>
     </IonPage>
   );

@@ -8,6 +8,8 @@ import (
 	"os"
 )
 
+const PRINT_TYPE = "books"
+
 type GoogleBooksAPISearch struct {
 	Kind       string                `json:"kind,omitempty"`
 	TotalItems int                   `json:"totalItems,omitempty"`
@@ -47,7 +49,6 @@ func NewGoogleBooksStore() *GoogleBookAPIStore {
 	apiKey := os.Getenv("GOOGLE_BOOKS_API_KEY")
 	if apiKey == "" {
 		fmt.Println("WARNING: GOOGLE_BOOKS_API_KEY not set")
-		return nil
 	}
 
 	return &GoogleBookAPIStore{
@@ -65,6 +66,7 @@ func (s *GoogleBookAPIStore) SearchGoogleBooks(query string) ([]GoogleBookBasicI
 	baseURL := "https://www.googleapis.com/books/v1/volumes"
 
 	params := url.Values{}
+	params.Add("printType", PRINT_TYPE)
 	params.Add("q", query)
 	params.Add("key", s.apiKey)
 

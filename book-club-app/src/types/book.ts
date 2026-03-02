@@ -14,10 +14,10 @@ export type BookImage = {
 export type Book = {
   id: number;
   title: string;
-  authors: string[];
+  authors: string[] | null;
   description: string;
   book_images: BookImage;
-  publisher: string;
+  publisher: string | null;
   published_date: string;
   isbn_10: string;
   isbn_13: string;
@@ -30,4 +30,8 @@ export type BookResponse = {
   page: number;
   total_items: number;
   total_pages: number;
+};
+
+export type BooksGoogleResponse = {
+  books: Book[];
 };
