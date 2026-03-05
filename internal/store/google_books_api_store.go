@@ -3,6 +3,7 @@ package store
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -80,7 +81,11 @@ func (s *GoogleBookAPIStore) SearchGoogleBooks(query string) ([]GoogleBookBasicI
 	if err != nil {
 		return nil, fmt.Errorf("error fetching Google books: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Println("error closing response body:", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("google api returned status: %d", resp.StatusCode)
