@@ -27,7 +27,6 @@ export function AdminBooks() {
       try {
         const response = await api.get<BookResponse>('/books');
         setBooks(response.data.books);
-        console.log(response.data);
       } catch (error) {
         console.error(error);
       } finally {

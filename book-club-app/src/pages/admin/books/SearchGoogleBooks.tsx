@@ -23,7 +23,6 @@ export function SearchGoogleBooks() {
     if (!query) return;
 
     const timeout = setTimeout(() => {
-      console.log('Searching for books with query:', query);
       handleBookSearch(query);
     }, 500);
 
@@ -51,10 +50,7 @@ export function SearchGoogleBooks() {
         },
       });
 
-      // TODO: Check if the response is valid and handle errors
-
       setNewBooks(response.data.books);
-      console.log(response.data.books);
     } catch (error) {
       console.error(error);
     } finally {

@@ -8,12 +8,11 @@ type BookGridProps = {
   books: Book[];
 };
 export function BookGrid({ books }: BookGridProps) {
-  console.log('Rendering BookGrid with books:', books);
   return (
     <IonGrid>
       <IonRow>
         {books.map((book) => (
-          <IonCol size="8" sizeMd="4" sizeLg="3" key={book.id}>
+          <IonCol size="8" sizeMd="4" sizeLg="2" key={book.id}>
             <BookCard book={book} />
           </IonCol>
         ))}

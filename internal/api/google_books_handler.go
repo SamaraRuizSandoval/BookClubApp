@@ -115,6 +115,7 @@ func mapGoogleToBook(book store.GoogleBookBasicInfo, index int) (*store.Book, er
 		ID:            int64(index),
 		Title:         book.VolumeInfo.Title,
 		Authors:       book.VolumeInfo.Authors,
+		Publisher:     book.VolumeInfo.Publisher,
 		PublishedDate: publishedDate,
 		Description:   descriptionPtr,
 		PageCount:     pageCountPtr,

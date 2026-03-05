@@ -24,6 +24,7 @@ type GoogleBookBasicInfo struct {
 type VolumeInfo struct {
 	Title               string               `json:"title,omitempty"`
 	Authors             []string             `json:"authors,omitempty"`
+	Publisher           string               `json:"publisher,omitempty"`
 	PublishedDate       string               `json:"publishedDate,omitempty"`
 	Description         string               `json:"description,omitempty"`
 	IndustryIdentifiers []IndustryIdentifier `json:"industryIdentifiers,omitempty"`
@@ -49,6 +50,9 @@ func NewGoogleBooksStore() *GoogleBookAPIStore {
 	apiKey := os.Getenv("GOOGLE_BOOKS_API_KEY")
 	if apiKey == "" {
 		fmt.Println("WARNING: GOOGLE_BOOKS_API_KEY not set")
+		return &GoogleBookAPIStore{
+			apiKey: "AIzaSyDCm8D4X35dhvaYui3YKKo4V0X6omB5q_k",
+		}
 	}
 
 	return &GoogleBookAPIStore{
