@@ -244,7 +244,7 @@ definitions:
     - RoleAdmin
   tokens.Token:
     properties:
-      expriy:
+      expiry:
         type: string
       token:
         type: string
@@ -306,6 +306,38 @@ paths:
       summary: Register a new admin account
       tags:
       - admins
+  /api/books:
+    get:
+      consumes:
+      - application/json
+      description: Searches for books in the Google Books API.
+      parameters:
+      - description: Search query (e.g. title, author)
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response with list of books
+          schema:
+            items:
+              $ref: '#/definitions/store.Book'
+            type: array
+        "400":
+          description: 'Error: Invalid or missing id'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Search Google Books
+      tags:
+      - google_books
   /books:
     get:
       consumes:

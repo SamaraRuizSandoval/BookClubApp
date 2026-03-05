@@ -81,6 +81,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/books": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Searches for books in the Google Books API.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "google_books"
+                ],
+                "summary": "Search Google Books",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query (e.g. title, author)",
+                        "name": "q",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with list of books",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/store.Book"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Invalid or missing id",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/books": {
             "get": {
                 "description": "Retrieves all books with pagination.",
@@ -1388,7 +1439,7 @@ const docTemplate = `{
         "tokens.Token": {
             "type": "object",
             "properties": {
-                "expriy": {
+                "expiry": {
                     "type": "string"
                 },
                 "token": {

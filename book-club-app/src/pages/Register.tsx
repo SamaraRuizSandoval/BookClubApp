@@ -19,6 +19,7 @@ export function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const [emailIsValid, setEmailIsValid] = useState<boolean>();
@@ -65,6 +66,7 @@ export function Register() {
     }
 
     try {
+      setIsLoading(true);
       setUsernameError(null); // clear previous error
 
       const response = await api.post('/users', {
@@ -73,19 +75,22 @@ export function Register() {
         password,
       });
 
+      setIsLoading(false);
       history.replace('/login', {
         message: 'Account created successfully!',
       });
       console.log('User registered:', response);
     } catch (error: any) {
+      setIsLoading(false);
       if (error.response?.data?.error === 'username already taken') {
         setUsernameError('Username is already taken');
+      } else if (error.response?.data?.error === 'email already in use') {
+        setUsernameError('Email already in use');
       } else {
+        setUsernameError('An error occurred during registration');
         console.error('Error registering user:', error);
       }
     }
-
-    //history.replace('/login');
   };
 
   return (
@@ -106,6 +111,7 @@ export function Register() {
                   placeholder="Username"
                   type="text"
                   errorText="Invalid email"
+                  disabled={isLoading}
                   value={username}
                   onIonInput={(e) => setUsername(e.detail.value!)}
                 />
@@ -116,6 +122,7 @@ export function Register() {
                   placeholder="Email"
                   type="email"
                   errorText="Invalid email"
+                  disabled={isLoading}
                   value={email}
                   onIonInput={(e) => {
                     const value = e.detail.value!;
@@ -132,6 +139,7 @@ export function Register() {
                   className={`${passwordsMatch === true && 'ion-valid'} ${passwordsMatch === false && 'ion-invalid'} ${passwordIsTouched && 'ion-touched'}`}
                   placeholder="Password"
                   type="password"
+                  disabled={isLoading}
                   value={password}
                   errorText="Passwords don't match"
                   onIonInput={(e) => setPassword(e.detail.value!)}
@@ -145,6 +153,7 @@ export function Register() {
                   placeholder="Confirm password"
                   type="password"
                   errorText="Passwords don't match"
+                  disabled={isLoading}
                   value={confirmPassword}
                   onIonInput={(e) => {
                     const confirmPass = e.detail.value!;
@@ -154,7 +163,7 @@ export function Register() {
                 />
               </IonItem>
               <IonButton
-                disabled={!emailIsValid || !passwordsMatch}
+                disabled={!emailIsValid || !passwordsMatch || isLoading}
                 color="primary"
                 shape="round"
                 size="default"
@@ -169,6 +178,7 @@ export function Register() {
                 fill="clear"
                 size="default"
                 expand="full"
+                disabled={isLoading}
                 className="secondary-button"
                 onClick={() => history.push('/login')}
               >
