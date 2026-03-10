@@ -2,6 +2,8 @@ package routes
 
 import (
 	"net/http"
+	"os"
+	"strings"
 
 	_ "github.com/SamaraRuizSandoval/BookClubApp/docs"
 	"github.com/SamaraRuizSandoval/BookClubApp/internal/app"
@@ -14,9 +16,10 @@ import (
 func SetupRouter(app *app.Application) *gin.Engine {
 	r := gin.Default()
 
-	//"http://localhost:5173"
+	allowedOrigins := os.Getenv("ALLOWED_ORIGINS")
+
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://zealous-wave-0844b9e0f.2.azurestaticapps.net"},
+		AllowOrigins:     strings.Split(allowedOrigins, ","),
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},

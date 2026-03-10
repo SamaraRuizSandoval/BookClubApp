@@ -51,9 +51,7 @@ func NewGoogleBooksStore() *GoogleBookAPIStore {
 	apiKey := os.Getenv("GOOGLE_BOOKS_API_KEY")
 	if apiKey == "" {
 		fmt.Println("WARNING: GOOGLE_BOOKS_API_KEY not set")
-		return &GoogleBookAPIStore{
-			apiKey: "AIzaSyDCm8D4X35dhvaYui3YKKo4V0X6omB5q_k",
-		}
+		return nil
 	}
 
 	return &GoogleBookAPIStore{
