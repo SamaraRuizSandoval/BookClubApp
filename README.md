@@ -14,16 +14,56 @@ https://bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io/swagg
 
 ---
 
+## 🏗 Architecture
+
+React Frontend
+      │
+      ▼
+Go REST API
+      │
+      ▼
+PostgreSQL Database
+
+---
+
 ## 🛠 Tech Stack
-- **Frontend**: React (Create React App)
-- **Backend**: Go
-- **Database**: PostgreSQL
-- **Deployment**: Docker
+**Frontend**
+- React (Create React App)
+- Capacitor (mobile builds)
+
+**Backend**
+- Go (REST API)
+- Swagger API documentation
+
+**Database**
+- PostgreSQL
+
+**Infrastructure**
+- Docker
+- Docker Compose
+- Azure deployment
 
 ## 📝 Documentation
 [Database Schema](https://dbdiagram.io/d/BookClub-68bc7d4961a46d388ec627de)
 
 ---
+
+## 🔐 Environment Variables
+
+The backend uses environment variables for configuration such as database credentials and API keys.
+
+For local development, create a .env file in the root of the project.
+
+```DB_HOST=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+DB_PORT=5432
+DB_SSLMODE=require
+ALLOWED_ORIGINS=
+GOOGLE_BOOKS_API_KEY=
+PORT=5000
+```
 
 ## ⚡ Getting Started
 

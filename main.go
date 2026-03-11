@@ -39,6 +39,7 @@ import (
 
 func main() {
 	var port int
+
 	flag.IntVar(&port, "port", 5000, "go backend server port")
 	flag.Parse() // Future note, use os.Getenv
 

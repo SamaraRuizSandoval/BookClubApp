@@ -1,6 +1,6 @@
 import { IonCol, IonGrid, IonRow } from '@ionic/react';
 
-import { Book } from '../types/book';
+import { Book } from '../../types/book';
 
 import { BookCard } from './BookCard';
 
@@ -12,7 +12,7 @@ export function BookGrid({ books }: BookGridProps) {
     <IonGrid>
       <IonRow>
         {books.map((book) => (
-          <IonCol size="8" sizeMd="4" sizeLg="2" key={book.id}>
+          <IonCol size="8" sizeMd="4" sizeLg="3" key={book.id}>
             <BookCard book={book} />
           </IonCol>
         ))}

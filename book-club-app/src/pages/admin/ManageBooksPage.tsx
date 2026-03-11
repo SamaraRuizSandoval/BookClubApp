@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import api from '../../api/axios';
-import { BookGrid } from '../../components/BooksGrid';
+import { BookGrid } from '../../components/books/BooksGrid';
 import { Book, BookResponse } from '../../types/book';
 
 export function AdminBooks() {
@@ -36,9 +36,6 @@ export function AdminBooks() {
     fetchBooks();
   }, []);
 
-  // TODO: We can add caching
-  // TODO: Add rate limiting
-  // TODO: Make this search paginated
   return (
     <IonPage>
       <IonHeader>

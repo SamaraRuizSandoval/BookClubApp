@@ -1,7 +1,6 @@
 import {
   IonHeader,
   IonToolbar,
-  IonTitle,
   IonButton,
   IonButtons,
   IonAvatar,
@@ -13,8 +12,8 @@ import {
 } from '@ionic/react';
 import { useState } from 'react';
 
-import profilePic from '../assets/images/person-circle.svg';
-import { useAuth } from '../context/AuthContext';
+import profilePic from '../../assets/images/person-circle.svg';
+import { useAuth } from '../../context/AuthContext';
 
 export function UpperNavigation() {
   const [showOptions, setShowOptions] = useState(false);
