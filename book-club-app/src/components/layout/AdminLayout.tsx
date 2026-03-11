@@ -16,11 +16,11 @@ import {
 import { bookOutline } from 'ionicons/icons';
 import { Route, Redirect, Switch } from 'react-router-dom';
 
-import { UpperNavigation } from '../../components/UpperNavigation';
+import { AdminBooks } from '../../pages/admin/ManageBooksPage';
+import { AddBookPage } from '../../pages/admin/books/AddBookPage';
+import { SearchGoogleBooks } from '../../pages/admin/books/SearchGoogleBooks';
 
-import { AdminBooks } from './AdminBooks';
-import { AddBookPage } from './books/AddBookPage';
-import { SearchGoogleBooks } from './books/SearchGoogleBooks';
+import { UpperNavigation } from './UpperNavigation';
 
 export function AdminLayout() {
   return (

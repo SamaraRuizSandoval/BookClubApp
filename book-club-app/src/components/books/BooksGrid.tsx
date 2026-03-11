@@ -1,6 +1,6 @@
 import { IonCol, IonGrid, IonRow } from '@ionic/react';
 
-import { Book } from '../types/book';
+import { Book } from '../../types/book';
 
 import { BookCard } from './BookCard';
 

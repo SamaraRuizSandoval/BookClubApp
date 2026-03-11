@@ -9,7 +9,7 @@ import {
 } from '@ionic/react';
 import { useLocation } from 'react-router-dom';
 
-import { UpperNavigation } from '../components/UpperNavigation';
+import { UpperNavigation } from '../components/layout/UpperNavigation';
 
 export function Page({ title }: { title: string }) {
   const location = useLocation();

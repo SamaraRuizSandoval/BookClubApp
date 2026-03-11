@@ -9,7 +9,7 @@ import {
 } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 
-import { Book } from '../types/book';
+import { Book } from '../../types/book';
 
 type BookCardProps = {
   book: Book;

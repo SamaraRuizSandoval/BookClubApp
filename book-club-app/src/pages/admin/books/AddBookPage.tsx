@@ -8,6 +8,7 @@ import {
   IonInput,
   IonTextarea,
   IonButton,
+  useIonToast,
 } from '@ionic/react';
 import { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -27,6 +28,7 @@ export function AddBookPage() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [present] = useIonToast();
 
   useEffect(() => {
     if (book) {
@@ -89,6 +91,12 @@ export function AddBookPage() {
           },
         },
       );
+      present({
+        message: 'Book added successfully!',
+        duration: 1500,
+        position: 'top',
+        color: 'success',
+      });
       console.log('Book added:', response.data);
       setIsLoading(false);
       history.push('/admin/books');
