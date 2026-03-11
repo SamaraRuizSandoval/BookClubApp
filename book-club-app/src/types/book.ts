@@ -16,6 +16,7 @@ export type Book = {
   title: string;
   authors: string[] | null;
   description: string;
+  page_count: number;
   book_images: BookImage;
   publisher: string | null;
   published_date: string;

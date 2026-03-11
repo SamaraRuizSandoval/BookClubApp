@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 
 import api from '../../../api/axios';
 import { BookGrid } from '../../../components/BooksGrid';
-import { Book, BookResponse, BooksGoogleResponse } from '../../../types/book';
+import { Book, BooksGoogleResponse } from '../../../types/book';
 
 export function SearchGoogleBooks() {
   const [query, setQuery] = useState('');

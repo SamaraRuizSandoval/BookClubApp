@@ -5,7 +5,9 @@ import {
   IonCardSubtitle,
   IonCardContent,
   IonImg,
+  IonButton,
 } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
 
 import { Book } from '../types/book';
 
@@ -14,6 +16,8 @@ type BookCardProps = {
 };
 
 export function BookCard({ book }: BookCardProps) {
+  const history = useHistory();
+
   return (
     <IonCard className="book-card">
       <div className="flex-center">
@@ -38,6 +42,12 @@ export function BookCard({ book }: BookCardProps) {
       </IonCardHeader>
 
       <IonCardContent>{book.publisher}</IonCardContent>
+      <IonButton
+        fill="clear"
+        onClick={() => history.push('/admin/books/add-book', { book })}
+      >
+        Add
+      </IonButton>
     </IonCard>
   );
 }
