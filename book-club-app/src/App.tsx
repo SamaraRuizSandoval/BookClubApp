@@ -6,6 +6,7 @@ import { LeftMenu } from './components/LeftMenu';
 import { AdminLayout } from './components/layout/AdminLayout';
 import { useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { LandingPage } from './pages/LandingPage';
 import { Login } from './pages/Login';
 import { Page } from './pages/Page';
 import { Register } from './pages/Register';
@@ -29,7 +30,7 @@ export default function App() {
         <IonRouterOutlet>
           <ToastProvider>
             <Switch>
-              {/* 🏠 LANDING */}
+              {/* 🏠 LANDING PAGE */}
               <Route
                 exact
                 path="/"
@@ -41,7 +42,7 @@ export default function App() {
                       <Redirect to="/home" />
                     )
                   ) : (
-                    <Redirect to="/login" />
+                    <LandingPage />
                   )
                 }
               />
@@ -50,16 +51,22 @@ export default function App() {
               <Route
                 path="/login"
                 render={() =>
-                  auth.isAuthenticated ? <Redirect to="/" /> : <Login />
+                  auth.isAuthenticated ? <Redirect to="/home" /> : <Login />
                 }
               />
 
-              <Route path="/register" component={Register} exact />
+              {/* 📝 REGISTER */}
+              <Route
+                path="/register"
+                render={() =>
+                  auth.isAuthenticated ? <Redirect to="/home" /> : <Register />
+                }
+              />
 
-              {/* 🔐 ADMIN LAYOUT */}
+              {/* 🔐 ADMIN */}
               <Route path="/admin" component={AdminLayout} />
 
-              {/* 🔐 USER LAYOUT (SplitPane with LeftMenu) */}
+              {/* 🔐 AUTHENTICATED USER AREA */}
               <Route>
                 <IonSplitPane when="md" contentId="main-content">
                   <LeftMenu />
@@ -76,7 +83,8 @@ export default function App() {
                         path="/settings"
                         component={() => <Page title="Settings" />}
                       />
-                      <Redirect exact from="/" to="/home" />
+
+                      {/* fallback */}
                       <Route component={() => <Page title="Not Found" />} />
                     </Switch>
                   </IonRouterOutlet>

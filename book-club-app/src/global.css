@@ -1,3 +1,54 @@
+:root {
+  --navy: #0c1224;
+  --navy-mid: #152336;
+  --navy-light: #1b2440;
+  --navy-border: rgba(255, 255, 255, 0.07);
+  --silver: #a8b8c8;
+  --silver-dim: #6a7f92;
+  --warm-white: #f0ede6;
+  --cream: #e8e2d8;
+  --gold: #c9a84c;
+  --gold-dim: #8a6b28;
+  --white: #ffffff;
+  --shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+  --radius: 14px;
+}
+
+ion-button.btn-primary {
+  --background: var(--gold);
+  --color: var(--navy);
+
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  --padding-start: 32px;
+  --padding-end: 32px;
+  text-transform: none;
+  border: none;
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3);
+}
+
+ion-button.btn-primary:hover {
+  --background: #d9b85c;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(201, 168, 76, 0.4);
+}
+
+ion-toolbar {
+  --padding-start: 1%;
+  --padding-end: 1%;
+  --height: 72px;
+  --background: #0c1224;
+  --backdrop-filter: blur(16px);
+  --border-bottom: 1px solid var(--navy-border);
+}
+
 .flex-center {
   display: flex;
   justify-content: center;
