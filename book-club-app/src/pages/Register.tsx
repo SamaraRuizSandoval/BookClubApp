@@ -110,7 +110,11 @@ export function Register() {
             <div>
               <IonGrid>
                 <IonRow className="register-container">
-                  <IonCol size="12" sizeMd="6" className="panel-left">
+                  <IonCol
+                    size="12"
+                    sizeMd="6"
+                    className="panel-left ion-padding"
+                  >
                     <InfoPanel />
                   </IonCol>
                   <IonCol size="12" sizeMd="6" class="panel-right">
