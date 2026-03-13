@@ -1,15 +1,13 @@
-import { IonGrid, IonRow, IonCol, IonContent, IonButton } from '@ionic/react';
+import { IonGrid, IonRow, IonCol, IonButton } from '@ionic/react';
 
 import { BookAnimation } from './BooksAnimation';
 
 import '../../styles/hero.css';
 import { StarsBackground } from '../StarsBackground';
-
-import { useEffect } from 'react';
 export function Hero() {
   return (
     <>
-      <section className="hero landing-content">
+      <section className="hero">
         <IonGrid>
           <StarsBackground />
           <IonRow className="ion-align-items-center">

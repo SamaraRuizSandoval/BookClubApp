@@ -57,34 +57,6 @@
     transform: scale(1.4);
   }
 }
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition:
-    opacity 0.7s ease,
-    transform 0.7s ease;
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.reveal-delay-1 {
-  transition-delay: 0.1s;
-}
-.reveal-delay-2 {
-  transition-delay: 0.2s;
-}
-.reveal-delay-3 {
-  transition-delay: 0.3s;
-}
-.reveal-delay-4 {
-  transition-delay: 0.4s;
-}
-
-.landing-content {
-  --background: var(--navy);
-  --color: var(--warm-white);
-}
 
 .hero {
   min-height: calc(100vh - 68px);
@@ -104,22 +76,6 @@
 .hero-text {
   text-align: center;
 }
-
-/* Star field */
-.stars-bg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-.star {
-  position: absolute;
-  background: var(--warm-white);
-  border-radius: 50%;
-  animation: twinkle var(--d, 3s) ease-in-out infinite;
-}
-
 /* Tablet */
 @media (min-width: 768px) {
   .hero-text {
@@ -146,7 +102,6 @@ ion-button.hero-login {
     color 0.2s,
     border-color 0.2s;
   padding-bottom: 1px;
-  margin-left: 20px;
 }
 
 .hero-eyebrow {

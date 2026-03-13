@@ -1,7 +1,10 @@
 :root {
-  --navy: #0c1224;
-  --navy-mid: #152336;
-  --navy-light: #1b2440;
+  /* Core backgrounds */
+  --navy-dark: #0a0f1e; /* deepest background (footer, edges) */
+  --navy: #0c1224; /* main app background */
+  --navy-mid: #152336; /* section backgrounds */
+  --navy-light: #1b2440; /* cards */
+  --navy-surface: #1f2a4b; /* elevated cards / hover surfaces */
   --navy-border: rgba(255, 255, 255, 0.07);
   --silver: #a8b8c8;
   --silver-dim: #6a7f92;
@@ -12,6 +15,53 @@
   --white: #ffffff;
   --shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
   --radius: 14px;
+}
+
+.midnight-bg {
+  position: relative;
+  min-height: 100%;
+  background: radial-gradient(circle at top, #1b2440, #0c1224);
+  overflow: hidden;
+}
+
+/* Star field */
+.stars-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.star {
+  position: absolute;
+  background: var(--warm-white);
+  border-radius: 50%;
+  animation: twinkle var(--d, 3s) ease-in-out infinite;
+}
+
+ion-input.custom:part(native) {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+ion-item {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+ion-input.custom {
+  --background: rgba(13, 27, 42, 0.6);
+  --color: var(--warm-white);
+  --placeholder-color: var(--silver-dim);
+  --placeholder-opacity: 0.8;
+
+  --padding-bottom: 13px;
+  --padding-end: 13px;
+  --padding-start: 16px;
+  --padding-top: 16px;
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.925rem;
 }
 
 ion-button.btn-primary {

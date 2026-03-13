@@ -1,0 +1,117 @@
+.inner-left-panel {
+  flex: 0 0 380px;
+  padding: 56px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+/* subtle gradient shimmer on the left panel */
+.panel-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(201, 168, 76, 0.06) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+.panel-left::after {
+  content: '';
+  position: absolute;
+  bottom: -120px;
+  right: -120px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(201, 168, 76, 0.08) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.panel-brand {
+  position: relative;
+  z-index: 1;
+}
+.panel-tagline {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.9rem;
+  line-height: 1.18;
+  color: var(--warm-white);
+  margin-top: 32px;
+}
+.panel-tagline em {
+  font-style: italic;
+  color: var(--gold);
+}
+.panel-desc {
+  font-size: 0.9rem;
+  color: var(--silver-dim);
+  line-height: 1.7;
+  margin-top: 16px;
+  font-weight: 300;
+}
+
+/* Mini feature list */
+.panel-features {
+  list-style: none;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.panel-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.875rem;
+  color: var(--silver);
+  line-height: 1.5;
+}
+.feat-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: rgba(201, 168, 76, 0.12);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  margin-top: 1px;
+}
+.panel-footer {
+  font-size: 0.78rem;
+  color: var(--silver-dim);
+  position: relative;
+  z-index: 1;
+}
+.panel-footer a {
+  color: var(--gold);
+  text-decoration: none;
+}
+.panel-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Decorative book stack in the panel */
+.mini-books {
+  position: absolute;
+  bottom: 100px;
+  right: 20px;
+  z-index: 0;
+  opacity: 0.18;
+}
+.mini-book {
+  position: absolute;
+  border-radius: 2px 6px 6px 2px;
+  box-shadow: 3px 4px 12px rgba(0, 0, 0, 0.4);
+}

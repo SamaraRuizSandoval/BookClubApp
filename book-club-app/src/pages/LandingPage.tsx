@@ -1,42 +1,22 @@
-import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonBackButton,
-  IonTitle,
-  IonButton,
-  IonContent,
-} from '@ionic/react';
+import { IonPage, IonHeader, IonContent } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
+
 
 import { AppFeatures } from '../components/landing_page/AppFeatures';
 import { Hero } from '../components/landing_page/Hero';
+import { LandingNavBar } from '../components/landing_page/NavBar';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import './LandingPage.css';
 
 export function LandingPage() {
+  useScrollReveal();
   const history = useHistory();
+
   return (
     <IonPage>
       {/* Nav */}
       <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton />
-          </IonButtons>
-          <IonTitle className="nav-logo" onClick={() => history.push('/')}>
-            📚 BookClub
-          </IonTitle>
-
-          <IonButtons slot="end">
-            <IonButton
-              className="btn-nav"
-              onClick={() => history.push('/register')}
-            >
-              Sign Up
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
+        <LandingNavBar />
       </IonHeader>
 
       <IonContent>

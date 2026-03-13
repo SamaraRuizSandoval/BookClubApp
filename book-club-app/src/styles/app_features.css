@@ -1,62 +1,6 @@
 @import '../global.css';
 
 /* ─── ANIMATIONS ─── */
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(22px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes bookFloat1 {
-  0%,
-  100% {
-    transform: rotate(-7deg) translateY(0);
-  }
-  50% {
-    transform: rotate(-7deg) translateY(-12px);
-  }
-}
-@keyframes bookFloat2 {
-  0%,
-  100% {
-    transform: rotate(5deg) translateY(0);
-  }
-  50% {
-    transform: rotate(5deg) translateY(-16px);
-  }
-}
-@keyframes bookFloat3 {
-  0%,
-  100% {
-    transform: rotate(-4deg) translateY(0);
-  }
-  50% {
-    transform: rotate(-4deg) translateY(-10px);
-  }
-}
-@keyframes twinkle {
-  0%,
-  100% {
-    opacity: 0.15;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.9;
-    transform: scale(1.4);
-  }
-}
 .reveal {
   opacity: 0;
   transform: translateY(28px);
@@ -79,11 +23,6 @@
 }
 .reveal-delay-4 {
   transition-delay: 0.4s;
-}
-
-.landing-content {
-  --background: var(--navy);
-  --color: var(--warm-white);
 }
 
 section {
@@ -133,9 +72,9 @@ section {
   gap: 2px;
 }
 .feature-card {
-  background: var(--navy-light);
-  padding: 40px 36px;
+  background: linear-gradient(145deg, #243650, #1b2440);
   border: 1px solid var(--navy-border);
+  padding: 40px 36px;
   transition:
     background 0.3s,
     border-color 0.3s;

@@ -1,16 +1,21 @@
 import {
   IonPage,
   IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardContent,
-  IonCardTitle,
   IonItem,
   IonInput,
   IonButton,
+  IonHeader,
+  IonGrid,
+  IonRow,
+  IonCol,
 } from '@ionic/react';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+
+import { StarsBackground } from '../components/StarsBackground';
+import { LandingNavBar } from '../components/landing_page/NavBar';
+import { InfoPanel } from '../components/register/InfoPanel';
+import '../styles/register.css';
 
 import api from '../api/axios';
 
@@ -95,98 +100,133 @@ export function Register() {
 
   return (
     <IonPage>
+      <IonHeader>
+        <LandingNavBar />
+      </IonHeader>
       <IonContent>
-        <div className="flex-center">
-          <IonCard>
-            <IonCardHeader>
-              <IonCardTitle>Create your account</IonCardTitle>
-            </IonCardHeader>
-
-            <IonCardContent>
-              {usernameError && (
-                <div className="error-message">{usernameError}</div>
-              )}
-              <IonItem lines="none">
-                <IonInput
-                  placeholder="Username"
-                  type="text"
-                  errorText="Invalid email"
-                  disabled={isLoading}
-                  value={username}
-                  onIonInput={(e) => setUsername(e.detail.value!)}
-                />
-              </IonItem>
-              <IonItem lines="none">
-                <IonInput
-                  className={`${emailIsValid && 'ion-valid'} ${emailIsValid === false && 'ion-invalid'} ${emailIsTouched && 'ion-touched'}`}
-                  placeholder="Email"
-                  type="email"
-                  errorText="Invalid email"
-                  disabled={isLoading}
-                  value={email}
-                  onIonInput={(e) => {
-                    const value = e.detail.value!;
-                    setEmail(value);
-                    validateEmail(value);
-                  }}
-                  onIonBlur={() => {
-                    markEmailTouched();
-                  }}
-                />
-              </IonItem>
-              <IonItem lines="none">
-                <IonInput
-                  className={`${passwordsMatch === true && 'ion-valid'} ${passwordsMatch === false && 'ion-invalid'} ${passwordIsTouched && 'ion-touched'}`}
-                  placeholder="Password"
-                  type="password"
-                  disabled={isLoading}
-                  value={password}
-                  errorText="Passwords don't match"
-                  onIonInput={(e) => setPassword(e.detail.value!)}
-                  onIonBlur={() => {
-                    markPasswordTouched();
-                  }}
-                />
-              </IonItem>
-              <IonItem lines="none">
-                <IonInput
-                  placeholder="Confirm password"
-                  type="password"
-                  errorText="Passwords don't match"
-                  disabled={isLoading}
-                  value={confirmPassword}
-                  onIonInput={(e) => {
-                    const confirmPass = e.detail.value!;
-                    setConfirmPassword(confirmPass);
-                    validatePasswords(password, confirmPass);
-                  }}
-                />
-              </IonItem>
-              <IonButton
-                disabled={!emailIsValid || !passwordsMatch || isLoading}
-                color="primary"
-                shape="round"
-                size="default"
-                expand="full"
-                className="primary-button"
-                onClick={handleRegister}
-              >
-                Sign up with username
-              </IonButton>
-              <IonButton
-                color="black"
-                fill="clear"
-                size="default"
-                expand="full"
-                disabled={isLoading}
-                className="secondary-button"
-                onClick={() => history.push('/login')}
-              >
-                Already have an account? Login
-              </IonButton>
-            </IonCardContent>
-          </IonCard>
-        </div>
+        <section className="midnight-bg">
+          <StarsBackground />
+          <div className="flex-center">
+            <div>
+              <IonGrid>
+                <IonRow className="register-container">
+                  <IonCol size="12" sizeMd="6" className="panel-left">
+                    <InfoPanel />
+                  </IonCol>
+                  <IonCol size="12" sizeMd="6" class="panel-right">
+                    <section
+                      className="inner-right-panel"
+                      aria-labelledby="form-heading"
+                    >
+                      <div id="formContent">
+                        <span
+                          className="form-eyebrow"
+                          aria-label="Step: Create your account"
+                        >
+                          ✦ &nbsp;Create your account
+                        </span>
+                        <h1 className="form-heading" id="form-heading">
+                          Welcome to
+                          <br />
+                          BookClub.
+                        </h1>
+                        <p className="form-sub">
+                          Already have an account? <a href="/login">Sign in</a>
+                        </p>
+                        {usernameError && (
+                          <div className="error-message">{usernameError}</div>
+                        )}
+                        <div className="form-grid">
+                          <IonItem lines="none" className="field-group full">
+                            <IonInput
+                              className="custom"
+                              placeholder="Username"
+                              type="text"
+                              errorText="Invalid email"
+                              disabled={isLoading}
+                              value={username}
+                              onIonInput={(e) => setUsername(e.detail.value!)}
+                            />
+                          </IonItem>
+                          <IonItem lines="none" className="field-group full">
+                            <IonInput
+                              className={`custom ${emailIsValid && 'ion-valid'} ${emailIsValid === false && 'ion-invalid'} ${emailIsTouched && 'ion-touched'}`}
+                              placeholder="Email"
+                              type="email"
+                              errorText="Invalid email"
+                              disabled={isLoading}
+                              value={email}
+                              onIonInput={(e) => {
+                                const value = e.detail.value!;
+                                setEmail(value);
+                                validateEmail(value);
+                              }}
+                              onIonBlur={() => {
+                                markEmailTouched();
+                              }}
+                            />
+                          </IonItem>
+                          <IonItem lines="none" className="field-group full">
+                            <IonInput
+                              className={`custom ${passwordsMatch === true && 'ion-valid'} ${passwordsMatch === false && 'ion-invalid'} ${passwordIsTouched && 'ion-touched'}`}
+                              placeholder="Password"
+                              type="password"
+                              disabled={isLoading}
+                              value={password}
+                              errorText="Passwords don't match"
+                              onIonInput={(e) => setPassword(e.detail.value!)}
+                              onIonBlur={() => {
+                                markPasswordTouched();
+                              }}
+                            />
+                          </IonItem>
+                          <IonItem lines="none" className="field-group full">
+                            <IonInput
+                              className="custom"
+                              placeholder="Confirm password"
+                              type="password"
+                              errorText="Passwords don't match"
+                              disabled={isLoading}
+                              value={confirmPassword}
+                              onIonInput={(e) => {
+                                const confirmPass = e.detail.value!;
+                                setConfirmPassword(confirmPass);
+                                validatePasswords(password, confirmPass);
+                              }}
+                            />
+                          </IonItem>
+                          <IonButton
+                            disabled={
+                              !emailIsValid || !passwordsMatch || isLoading
+                            }
+                            size="default"
+                            expand="full"
+                            className="btn-submit"
+                            id="submitBtn"
+                            onClick={handleRegister}
+                          >
+                            Sign up with username
+                          </IonButton>
+                          <IonButton
+                            color="black"
+                            fill="clear"
+                            size="default"
+                            expand="full"
+                            disabled={isLoading}
+                            className="secondary-button"
+                            onClick={() => history.push('/login')}
+                          >
+                            Already have an account? Login
+                          </IonButton>
+                        </div>
+                      </div>
+                    </section>
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+            </div>
+          </div>
+        </section>
       </IonContent>
     </IonPage>
   );
