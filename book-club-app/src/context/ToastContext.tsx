@@ -29,6 +29,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         duration={3000}
         onDidDismiss={() => setIsOpen(false)}
         position="top"
+        className="success-toast"
       />
     </ToastContext.Provider>
   );

@@ -1,3 +1,5 @@
+@import '../global.css';
+
 .register-container {
   display: flex;
   width: 100%;
@@ -25,12 +27,81 @@
   border-color: var(--silver);
 }
 
-/* ─── LEFT PANEL ─── */
+/* ─── LOGIN PAGE ─── */
+.page-wrap {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+}
+
+/* ─── LOGIN CARD ─── */
+.login-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  background: var(--navy-mid);
+  border: 1px solid var(--navy-border);
+  border-radius: var(--radius);
+  padding: 52px 48px 44px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+/* gold shimmer top-left */
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold) 0%, transparent 60%);
+  opacity: 0.6;
+}
+.login-card::after {
+  content: '';
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(201, 168, 76, 0.06) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.forgot-link {
+  display: block; /* allows spacing and alignment */
+  font-size: 0.75rem;
+  color: var(--silver-dim);
+  text-decoration: none;
+
+  margin-bottom: 10px; /* space before password field */
+  text-align: right;
+  padding-right: 15px;
+
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: var(--gold);
+}
+
+/* ─── LEFT PANEL REGISTER ─── */
 
 .panel-left {
   background: var(--navy-mid);
 }
-/* ─── RIGHT PANEL (form) ─── */
+/* ─── RIGHT PANEL (form) REGISTER ─── */
 .panel-right {
   background: var(--navy-light);
 }
@@ -63,12 +134,19 @@
 .form-heading {
   font-family: 'DM Serif Display', serif;
   font-size: 2rem;
+  line-height: 1.12;
   color: var(--warm-white);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   opacity: 0;
   animation: fadeUp 0.6s 0.2s forwards;
   line-height: 1.15;
 }
+
+.form-heading em {
+  font-style: italic;
+  color: var(--gold);
+}
+
 .form-sub {
   font-size: 0.875rem;
   color: var(--silver-dim);
@@ -95,7 +173,7 @@
 }
 
 ion-item.field-group {
-  --background: var(--navy-light);
+  --background: tansparent;
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
@@ -144,4 +222,59 @@ ion-button.btn-submit:hover {
   --background: #d9b85c;
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(201, 168, 76, 0.4);
+}
+
+/* Divider */
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+  opacity: 0;
+  animation: fadeUp 0.5s 0.55s forwards;
+}
+.or-divider::before,
+.or-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--navy-border);
+}
+.or-text {
+  font-size: 0.72rem;
+  color: var(--silver-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ─── READING QUOTE ─── */
+.quote-strip {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--navy-border);
+  opacity: 0;
+  animation: fadeUp 0.5s 0.65s forwards;
+}
+.quote-mark {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2.5rem;
+  color: var(--gold);
+  line-height: 0.6;
+  display: block;
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+.quote-text {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--silver);
+  line-height: 1.55;
+}
+.quote-author {
+  font-size: 0.75rem;
+  color: var(--silver-dim);
+  margin-top: 8px;
+  letter-spacing: 0.04em;
 }

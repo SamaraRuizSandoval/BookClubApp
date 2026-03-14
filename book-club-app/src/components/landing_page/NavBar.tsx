@@ -12,6 +12,7 @@ export function LandingNavBar() {
   const history = useHistory();
   const location = useLocation();
   const isRegisterPage = location.pathname === '/register';
+  const isLoginPage = location.pathname === '/login';
   return (
     <>
       <IonToolbar>
@@ -30,6 +31,13 @@ export function LandingNavBar() {
               onClick={() => history.push('/login')}
             >
               Already a member? Sign in
+            </IonButton>
+          ) : isLoginPage ? (
+            <IonButton
+              className="nav-login "
+              onClick={() => history.push('/register')}
+            >
+              New here? Create an account
             </IonButton>
           ) : (
             <IonButton

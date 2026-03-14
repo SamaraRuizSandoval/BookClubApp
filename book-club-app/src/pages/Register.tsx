@@ -8,14 +8,15 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  useIonToast,
 } from '@ionic/react';
 import { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import { StarsBackground } from '../components/StarsBackground';
 import { LandingNavBar } from '../components/landing_page/NavBar';
 import { InfoPanel } from '../components/register/InfoPanel';
-import '../styles/register.css';
+import '../styles/auth_forms.css';
 
 import api from '../api/axios';
 
@@ -31,7 +32,9 @@ export function Register() {
   const [emailIsTouched, setEmailTouched] = useState(false);
   const [passwordsMatch, setPasswordsMatch] = useState<boolean>();
   const [passwordIsTouched, setPasswordTouched] = useState(false);
+  const location = useLocation();
   const history = useHistory();
+  const [present] = useIonToast();
 
   const isEmailValid = (email: string) => {
     return email.match(
@@ -81,9 +84,13 @@ export function Register() {
       });
 
       setIsLoading(false);
-      history.replace('/login', {
+      present({
         message: 'Account created successfully!',
+        duration: 1500,
+        position: 'top',
+        color: 'success',
       });
+      history.push('login');
       console.log('User registered:', response);
     } catch (error: any) {
       setIsLoading(false);

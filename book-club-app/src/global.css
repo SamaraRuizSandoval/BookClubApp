@@ -39,12 +39,7 @@
   animation: twinkle var(--d, 3s) ease-in-out infinite;
 }
 
-ion-input.custom:part(native) {
-  text-transform: none;
-  letter-spacing: normal;
-}
-
-ion-item {
+ion-input.custom {
   text-transform: none;
   letter-spacing: normal;
 }
@@ -92,11 +87,22 @@ ion-button.btn-primary:hover {
 
 ion-toolbar {
   --padding-start: 1%;
-  --padding-end: 3%;
+  --padding-end: 5%;
   --height: 72px;
   --background: #0c1224;
   --backdrop-filter: blur(16px);
   --border-bottom: 1px solid var(--navy-border);
+}
+
+.success-toast {
+  --background: #0f766e;
+  --color: white;
+  --border-radius: 10px;
+  --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .flex-center {

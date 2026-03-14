@@ -1,22 +1,22 @@
 import {
   IonPage,
+  IonHeader,
   IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardContent,
-  IonCardTitle,
-  IonItem,
   IonInput,
   IonButton,
-  IonToast,
+  IonItem,
 } from '@ionic/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 
+import '../styles/auth_forms.css';
 import api from '../api/axios';
+import { StarsBackground } from '../components/StarsBackground';
+import { LandingNavBar } from '../components/landing_page/NavBar';
 import { useAuth } from '../context/AuthContext';
 import { AuthTokenResponse } from '../types/auth';
 import { User } from '../types/user';
+
 
 type LoginLocationState = {
   message?: string;
@@ -31,9 +31,29 @@ export function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   const location = useLocation<LoginLocationState>();
-  const successMessage = (location.state as LoginLocationState | undefined)
-    ?.message;
-  const [showToast, setShowToast] = useState(!!successMessage);
+
+  const quotes = [
+    {
+      text: 'A reader lives a thousand lives before he dies. The man who never reads lives only one.',
+      author: 'George R.R. Martin',
+    },
+    { text: 'Not all those who wander are lost.', author: 'J.R.R. Tolkien' },
+    {
+      text: 'There is no friend as loyal as a book.',
+      author: 'Ernest Hemingway',
+    },
+    {
+      text: 'One must always be careful of books, and what is inside them, for words have the power to change us.',
+      author: 'Cassandra Clare',
+    },
+    { text: 'So many books, so little time.', author: 'Frank Zappa' },
+  ];
+  const [currentQuote, setCurrentQuote] = useState(quotes[0]);
+
+  useEffect(() => {
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    setCurrentQuote(randomQuote);
+  }, []);
 
   const handleLogin = async () => {
     setErrorMessage(null); // Clear previous error message
@@ -75,27 +95,35 @@ export function Login() {
 
   return (
     <IonPage>
-      <IonToast
-        isOpen={showToast}
-        message={successMessage}
-        position="top"
-        duration={3000}
-        color="success"
-        onDidDismiss={() => setShowToast(false)}
-      />
-      <IonContent>
-        <div className="flex-center">
-          <IonCard>
-            <IonCardHeader>
-              <IonCardTitle>Login</IonCardTitle>
-            </IonCardHeader>
+      <IonHeader>
+        <LandingNavBar />
+      </IonHeader>
 
-            <IonCardContent>
+      <IonContent>
+        <section className="midnight-bg">
+          <StarsBackground />
+          <div className="page-wrap">
+            <div
+              className="login-card"
+              role="region"
+              aria-label="Sign in to BookClub"
+            >
+              <span className="form-eyebrow">✦ &nbsp;Welcome back</span>
+              <h1 className="form-heading">
+                Good to see
+                <br />
+                you <em>again.</em>
+              </h1>
+              <p className="form-sub">
+                Don't have an account? <a href="/register">Join for free</a>
+              </p>
+
               {errorMessage && (
                 <div className="error-message">{errorMessage}</div>
               )}
-              <IonItem>
+              <IonItem className="field-group full">
                 <IonInput
+                  className="custom"
                   placeholder="Username"
                   type="text"
                   disabled={isLoading}
@@ -103,8 +131,12 @@ export function Login() {
                   onIonInput={(e) => setUsername(e.detail.value!)}
                 />
               </IonItem>
-              <IonItem>
+              <a href="/login" className="forgot-link">
+                Forgot password?
+              </a>
+              <IonItem className="field-group full">
                 <IonInput
+                  className="custom"
                   placeholder="Password"
                   type="password"
                   disabled={isLoading}
@@ -114,30 +146,26 @@ export function Login() {
               </IonItem>
               <IonButton
                 disabled={isLoading}
-                color="primary"
-                shape="round"
-                size="default"
                 expand="full"
-                className="primary-button"
+                className="btn-submit"
                 onClick={handleLogin}
               >
                 Login with username
               </IonButton>
 
-              <IonButton
-                disabled={isLoading}
-                color="black"
-                fill="clear"
-                size="default"
-                expand="full"
-                className="secondary-button"
-                onClick={() => history.push('/register')}
-              >
-                Don't have an account? Register
-              </IonButton>
-            </IonCardContent>
-          </IonCard>
-        </div>
+              <div className="or-divider" aria-hidden="true">
+                <span className="or-text">or continue with</span>
+              </div>
+              <div className="quote-strip" aria-label="Reading quote">
+                <span className="quote-mark" aria-hidden="true">
+                  "
+                </span>
+                <p className="quote-text">{currentQuote.text}</p>
+                <p className="quote-author">— {currentQuote.author}</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </IonContent>
     </IonPage>
   );
