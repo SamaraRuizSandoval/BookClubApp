@@ -7,7 +7,7 @@ import {
   IonItem,
 } from '@ionic/react';
 import { useState, useEffect } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import '../styles/auth_forms.css';
 import api from '../api/axios';
