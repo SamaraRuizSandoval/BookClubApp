@@ -17,7 +17,6 @@ import { useAuth } from '../context/AuthContext';
 import { AuthTokenResponse } from '../types/auth';
 import { User } from '../types/user';
 
-
 type LoginLocationState = {
   message?: string;
 };
