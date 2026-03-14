@@ -4,7 +4,6 @@ import {
   IonBackButton,
   IonTitle,
   IonButton,
-  IonContent,
 } from '@ionic/react';
 import { useHistory, useLocation } from 'react-router-dom';
 

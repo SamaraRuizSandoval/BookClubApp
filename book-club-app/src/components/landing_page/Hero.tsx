@@ -1,10 +1,11 @@
 import { IonGrid, IonRow, IonCol, IonButton } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 
+import { StarsBackground } from '../StarsBackground';
+
 import { BookAnimation } from './BooksAnimation';
 
 import '../../styles/hero.css';
-import { StarsBackground } from '../StarsBackground';
 export function Hero() {
   const history = useHistory();
   return (

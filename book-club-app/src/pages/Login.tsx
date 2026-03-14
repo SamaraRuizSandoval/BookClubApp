@@ -29,8 +29,6 @@ export function Login() {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(false);
 
-  const location = useLocation<LoginLocationState>();
-
   const quotes = [
     {
       text: 'A reader lives a thousand lives before he dies. The man who never reads lives only one.',

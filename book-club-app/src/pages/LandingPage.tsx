@@ -1,6 +1,4 @@
 import { IonPage, IonHeader, IonContent } from '@ionic/react';
-import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
 
 import { AppFeatures } from '../components/landing_page/AppFeatures';
 import { Hero } from '../components/landing_page/Hero';
@@ -10,20 +8,6 @@ import './LandingPage.css';
 
 export function LandingPage() {
   useScrollReveal();
-  const history = useHistory();
-  const [showFooter, setShowFooter] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      // Show footer after scrolling 200px (adjust as needed)
-      setShowFooter(scrollY > 200);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <IonPage>
       {/* Nav */}
