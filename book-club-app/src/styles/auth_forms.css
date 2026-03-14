@@ -1,0 +1,280 @@
+@import '../global.css';
+
+.register-container {
+  display: flex;
+  width: 100%;
+  max-width: 960px;
+  gap: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--navy-border);
+}
+
+.nav-login {
+  font-size: 0.88rem;
+  color: var(--silver-dim);
+  text-decoration: none;
+  font-weight: 400;
+  border-bottom: 1px solid rgba(106, 127, 146, 0.4);
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+  padding-bottom: 1px;
+}
+.nav-login:hover {
+  color: var(--silver);
+  border-color: var(--silver);
+}
+
+/* ─── LOGIN PAGE ─── */
+.page-wrap {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+}
+
+/* ─── LOGIN CARD ─── */
+.login-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  background: var(--navy-mid);
+  border: 1px solid var(--navy-border);
+  border-radius: var(--radius);
+  padding: 52px 48px 44px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+/* gold shimmer top-left */
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold) 0%, transparent 60%);
+  opacity: 0.6;
+}
+.login-card::after {
+  content: '';
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(201, 168, 76, 0.06) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.forgot-link {
+  display: block; /* allows spacing and alignment */
+  font-size: 0.75rem;
+  color: var(--silver-dim);
+  text-decoration: none;
+
+  margin-bottom: 10px; /* space before password field */
+  text-align: right;
+  padding-right: 15px;
+
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: var(--gold);
+}
+
+/* ─── LEFT PANEL REGISTER ─── */
+
+.panel-left {
+  background: var(--navy-mid);
+}
+/* ─── RIGHT PANEL (form) REGISTER ─── */
+.panel-right {
+  background: var(--navy-light);
+}
+
+.inner-right-panel {
+  flex: 1;
+  padding: 56px 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.form-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: fadeUp 0.6s 0.1s forwards;
+}
+
+.form-heading {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  line-height: 1.12;
+  color: var(--warm-white);
+  margin-bottom: 6px;
+  opacity: 0;
+  animation: fadeUp 0.6s 0.2s forwards;
+  line-height: 1.15;
+}
+
+.form-heading em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.form-sub {
+  font-size: 0.875rem;
+  color: var(--silver-dim);
+  margin-bottom: 36px;
+  font-weight: 300;
+  opacity: 0;
+  animation: fadeUp 0.6s 0.3s forwards;
+}
+.form-sub a {
+  color: var(--gold);
+  text-decoration: none;
+}
+.form-sub a:hover {
+  text-decoration: underline;
+}
+
+/* ─── FORM FIELDS ─── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+  opacity: 0;
+  animation: fadeUp 0.6s 0.35s forwards;
+}
+
+ion-item.field-group {
+  --background: tansparent;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  --border: 1px solid rgba(255, 255, 255, 0.1);
+  --border-radius: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.field-group.full {
+  grid-column: 1 / -1;
+}
+
+ion-button.btn-submit {
+  --background: var(--gold);
+  --color: var(--navy);
+  --border: none;
+  --border-radius: 8px;
+
+  --padding-top: 15px;
+  --padding-bottom: 15px;
+  --padding-start: 15px;
+  --padding-end: 15px;
+
+  text-transform: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.22s;
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3);
+  opacity: 0;
+  animation: fadeUp 0.6s 0.55s forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+ion-button.btn-submit.button-disabled {
+  --background: #e0ce9f;
+  --color: #777;
+  box-shadow: none;
+  transform: none;
+}
+
+ion-button.btn-submit:hover {
+  --background: #d9b85c;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(201, 168, 76, 0.4);
+}
+
+/* Divider */
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+  opacity: 0;
+  animation: fadeUp 0.5s 0.55s forwards;
+}
+.or-divider::before,
+.or-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--navy-border);
+}
+.or-text {
+  font-size: 0.72rem;
+  color: var(--silver-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ─── READING QUOTE ─── */
+.quote-strip {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--navy-border);
+  opacity: 0;
+  animation: fadeUp 0.5s 0.65s forwards;
+}
+.quote-mark {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2.5rem;
+  color: var(--gold);
+  line-height: 0.6;
+  display: block;
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+.quote-text {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--silver);
+  line-height: 1.55;
+}
+.quote-author {
+  font-size: 0.75rem;
+  color: var(--silver-dim);
+  margin-top: 8px;
+  letter-spacing: 0.04em;
+}
