@@ -1,10 +1,12 @@
 import { IonGrid, IonRow, IonCol, IonButton } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
 
 import { BookAnimation } from './BooksAnimation';
 
 import '../../styles/hero.css';
 import { StarsBackground } from '../StarsBackground';
 export function Hero() {
+  const history = useHistory();
   return (
     <>
       <section className="hero">
@@ -26,8 +28,17 @@ export function Hero() {
                   next favorite book — with a community that gets you.
                 </span>
               </p>
-              <IonButton className="btn-primary">Join for Free</IonButton>
-              <IonButton className="hero-login" fill="clear">
+              <IonButton
+                className="btn-primary"
+                onClick={() => history.push('/register')}
+              >
+                Join for Free
+              </IonButton>
+              <IonButton
+                className="hero-login"
+                fill="clear"
+                onClick={() => history.push('/login')}
+              >
                 Already a member? Log in
               </IonButton>
             </IonCol>

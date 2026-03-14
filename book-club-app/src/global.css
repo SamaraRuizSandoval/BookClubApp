@@ -92,7 +92,7 @@ ion-button.btn-primary:hover {
 
 ion-toolbar {
   --padding-start: 1%;
-  --padding-end: 1%;
+  --padding-end: 3%;
   --height: 72px;
   --background: #0c1224;
   --backdrop-filter: blur(16px);
@@ -155,13 +155,14 @@ ion-card-title.book-card {
 }
 
 .error-message {
-  background-color: #ffebe9;
-  border: 1px solid #ff8182;
-  color: #cf222e;
+  background: #efc0c0;
+  border: 1px solid #eb8b90;
+  color: #b4232c;
   padding: 12px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   margin-bottom: 16px;
-  font-size: 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 ion-avatar {

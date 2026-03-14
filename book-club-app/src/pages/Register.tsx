@@ -199,30 +199,19 @@ export function Register() {
                               }}
                             />
                           </IonItem>
-                          <IonButton
-                            disabled={
-                              !emailIsValid || !passwordsMatch || isLoading
-                            }
-                            size="default"
-                            expand="full"
-                            className="btn-submit"
-                            id="submitBtn"
-                            onClick={handleRegister}
-                          >
-                            Sign up with username
-                          </IonButton>
-                          <IonButton
-                            color="black"
-                            fill="clear"
-                            size="default"
-                            expand="full"
-                            disabled={isLoading}
-                            className="secondary-button"
-                            onClick={() => history.push('/login')}
-                          >
-                            Already have an account? Login
-                          </IonButton>
                         </div>
+                        <IonButton
+                          disabled={
+                            !emailIsValid || !passwordsMatch || isLoading
+                          }
+                          size="default"
+                          expand="full"
+                          className="btn-submit"
+                          id="submitBtn"
+                          onClick={handleRegister}
+                        >
+                          Sign up with username
+                        </IonButton>
                       </div>
                     </section>
                   </IonCol>
