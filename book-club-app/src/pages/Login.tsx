@@ -146,9 +146,9 @@ export function Login() {
                 Login with username
               </IonButton>
 
-              <div className="or-divider" aria-hidden="true">
+              {/* <div className="or-divider" aria-hidden="true">
                 <span className="or-text">or continue with</span>
-              </div>
+              </div> */}
               <div className="quote-strip" aria-label="Reading quote">
                 <span className="quote-mark" aria-hidden="true">
                   "

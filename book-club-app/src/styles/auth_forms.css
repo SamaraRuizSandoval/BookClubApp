@@ -27,6 +27,20 @@
   border-color: var(--silver);
 }
 
+.mobile-text {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .desktop-text {
+    display: none;
+  }
+
+  .mobile-text {
+    display: inline;
+  }
+}
+
 /* ─── LOGIN PAGE ─── */
 .page-wrap {
   flex: 1;
@@ -277,4 +291,62 @@ ion-button.btn-submit:hover {
   color: var(--silver-dim);
   margin-top: 8px;
   letter-spacing: 0.04em;
+}
+
+/* ─── MOBILE ─── */
+@media (max-width: 768px) {
+  /* ─── REGISTER ─── */
+  .panel-left {
+    display: none;
+  }
+
+  .inner-right-panel {
+    background: var(--navy-mid);
+  }
+
+  .inner-right-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--gold) 0%, transparent 60%);
+    opacity: 0.6;
+  }
+  .inner-right-panel::after {
+    content: '';
+    position: absolute;
+    top: -120px;
+    right: -120px;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(201, 168, 76, 0.06) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 480px) {
+  /* ─── LOGIN ─── */
+  .page-wrap {
+    padding: 4px 10px;
+  }
+  .login-card {
+    padding: 20px 24px;
+  }
+
+  /* ─── REGISTER ─── */
+
+  .panel-right {
+    background: var(--navy-mid);
+  }
+
+  .inner-right-panel {
+    padding: 20px 24px;
+  }
 }

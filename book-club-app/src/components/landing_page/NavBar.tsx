@@ -29,14 +29,16 @@ export function LandingNavBar() {
               className="nav-login"
               onClick={() => history.push('/login')}
             >
-              Already a member? Sign in
+              <span className="desktop-text">Already a member? Sign in</span>
+              <span className="mobile-text">Sign in</span>
             </IonButton>
           ) : isLoginPage ? (
             <IonButton
               className="nav-login "
               onClick={() => history.push('/register')}
             >
-              New here? Create an account
+              <span className="desktop-text">New here? Create an account</span>
+              <span className="mobile-text">Sign up</span>
             </IonButton>
           ) : (
             <IonButton
