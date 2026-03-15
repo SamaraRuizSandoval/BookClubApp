@@ -124,7 +124,7 @@ export function Register() {
                   >
                     <InfoPanel />
                   </IonCol>
-                  <IonCol size="12" sizeMd="6" class="panel-right">
+                  <IonCol size="12" sizeMd="6" className="panel-right">
                     <section
                       className="inner-right-panel"
                       aria-labelledby="form-heading"
