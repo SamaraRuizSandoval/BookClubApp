@@ -3,7 +3,6 @@ import {
   IonToolbar,
   IonButton,
   IonButtons,
-  IonAvatar,
   IonPopover,
   IonList,
   IonItem,
@@ -11,14 +10,8 @@ import {
   IonMenuButton,
 } from '@ionic/react';
 import { useState } from 'react';
-import { useLocation } from 'react-router';
 
 import { useAuth } from '../../context/AuthContext';
-import { User } from '../../types/user';
-
-type UserData = {
-  user: User;
-};
 
 export function UpperNavigation() {
   const { auth } = useAuth();

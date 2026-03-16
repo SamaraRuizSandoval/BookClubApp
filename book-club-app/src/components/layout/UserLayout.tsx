@@ -1,11 +1,7 @@
 import {
-  IonContent,
-  IonMenu,
   IonMenuToggle,
   IonPage,
   IonRouterOutlet,
-  IonTitle,
-  IonToolbar,
   IonHeader,
   IonSplitPane,
 } from '@ionic/react';
@@ -21,32 +17,6 @@ import {
 import { LeftMenu } from '../LeftMenu';
 
 import { UpperNavigation } from './UpperNavigation';
-
-const navItems = [
-  { to: '/home', icon: '🔍', label: 'Browse Books' },
-  { to: '/my-shelf', icon: '🏠', label: 'My Shelf' },
-];
-
-const bookCollections = [
-  {
-    to: '/reading',
-    style: { background: 'var(--reading)' },
-    label: 'Reading',
-    id: 'count-reading',
-  },
-  {
-    to: '/wishlist',
-    style: { background: 'var(--want)' },
-    label: 'Wishlist',
-    id: 'count-want',
-  },
-  {
-    to: '/completed',
-    style: { background: 'var(--done)' },
-    label: 'Completed',
-    id: 'count-done',
-  },
-];
 
 export function UserLayout() {
   const location = useLocation();
