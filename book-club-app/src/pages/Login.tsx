@@ -9,13 +9,11 @@ import {
 import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import '../styles/auth_forms.css';
-import api from '../api/axios';
+import '../styles/auth-forms.css';
+import { loginUser } from '../api/authApi';
 import { StarsBackground } from '../components/StarsBackground';
 import { LandingNavBar } from '../components/landing_page/NavBar';
 import { useAuth } from '../context/AuthContext';
-import { AuthTokenResponse } from '../types/auth';
-import { User } from '../types/user';
 
 export function Login() {
   const [username, setUsername] = useState('');
@@ -54,27 +52,9 @@ export function Login() {
     try {
       setIsLoading(true);
 
-      const authResponse = await api.post<AuthTokenResponse>(
-        '/tokens/authentication',
-        {
-          username: username,
-          password: password,
-        },
-      );
+      const { token, expiry, user } = await loginUser(username, password);
 
-      const { token, expiry } = authResponse.data.auth_token;
-
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('authExpiry', expiry);
-
-      const userResponse = await api.get<User>('/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const user = userResponse.data;
-
-      login(token, expiry, userResponse.data);
+      login(token, expiry, user);
       setIsLoading(false);
       if (user.role === 'admin') {
         history.replace('/admin');

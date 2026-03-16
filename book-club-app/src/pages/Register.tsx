@@ -16,9 +16,9 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { StarsBackground } from '../components/StarsBackground';
 import { LandingNavBar } from '../components/landing_page/NavBar';
 import { InfoPanel } from '../components/register/InfoPanel';
-import '../styles/auth_forms.css';
+import '../styles/auth-forms.css';
 
-import api from '../api/axios';
+import { api } from '../api/apiClient';
 
 export function Register() {
   const [username, setUsername] = useState('');

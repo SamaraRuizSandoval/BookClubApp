@@ -10,7 +10,7 @@ import {
 } from '@ionic/react';
 import { useEffect, useState } from 'react';
 
-import api from '../../../api/axios';
+import { api } from '../../../api/apiClient';
 import { BookGrid } from '../../../components/books/BooksGrid';
 import { Book, BooksGoogleResponse } from '../../../types/book';
 

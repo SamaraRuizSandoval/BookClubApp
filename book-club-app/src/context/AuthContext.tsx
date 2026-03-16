@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-import { AuthState, AuthTokenResponse } from '../types/auth';
+import { getCurrentUser } from '../api/authApi';
+import { AuthState } from '../types/auth';
 import { User } from '../types/user';
 
 type AuthContextType = {
@@ -25,51 +26,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 🔄 Restore session on app load
   useEffect(() => {
-    const storedToken = localStorage.getItem('authToken');
-    const storedExpiry = localStorage.getItem('authExpiry');
-    const storedUser = localStorage.getItem('user');
+    const restoreSession = async () => {
+      const storedToken = localStorage.getItem('authToken');
+      const storedExpiry = localStorage.getItem('authExpiry');
 
-    if (!storedToken || !storedExpiry) {
-      setInitializing(false);
-      return;
-    }
+      if (!storedToken || !storedExpiry) {
+        setInitializing(false);
+        return;
+      }
 
-    const expiryDate = new Date(storedExpiry);
+      const expiryDate = new Date(storedExpiry);
 
-    if (expiryDate <= new Date()) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('authExpiry');
-      localStorage.removeItem('user');
+      if (expiryDate <= new Date()) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('authExpiry');
+        localStorage.removeItem('user');
+        setInitializing(false);
+        return;
+      }
 
-      setInitializing(false);
-      return;
-    }
+      try {
+        const user = await getCurrentUser();
 
-    fetch(
-      'https://bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io/me',
-      {
-        headers: {
-          Authorization: `Bearer ${storedToken}`,
-        },
-      },
-    )
-      .then((res) => {
-        if (!res.ok) throw new Error('Invalid token');
-        return res.json();
-      })
-      .then((user) => {
         setAuth({
           token: storedToken,
           user,
           isAuthenticated: true,
         });
-      })
-      .catch(() => {
+      } catch (error) {
         localStorage.removeItem('authToken');
-      })
-      .finally(() => {
+      } finally {
         setInitializing(false);
-      });
+      }
+    };
+
+    restoreSession();
   }, []);
 
   const login = (token: string, expiry: string, user: User) => {

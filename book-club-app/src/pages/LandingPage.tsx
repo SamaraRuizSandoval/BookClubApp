@@ -4,7 +4,7 @@ import { AppFeatures } from '../components/landing_page/AppFeatures';
 import { Hero } from '../components/landing_page/Hero';
 import { LandingNavBar } from '../components/landing_page/NavBar';
 import { useScrollReveal } from '../hooks/useScrollReveal';
-import './LandingPage.css';
+import './landing-page.css';
 
 export function LandingPage() {
   useScrollReveal();

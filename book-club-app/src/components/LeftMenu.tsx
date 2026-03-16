@@ -7,7 +7,7 @@ import {
   IonMenuToggle,
 } from '@ionic/react';
 import { useLocation } from 'react-router-dom';
-import '../styles/left_menu.css';
+import '../styles/left-menu.css';
 import '../global.css';
 
 const navItems = [

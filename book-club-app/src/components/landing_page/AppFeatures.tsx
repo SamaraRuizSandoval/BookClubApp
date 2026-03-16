@@ -1,5 +1,5 @@
 import { IonGrid, IonRow, IonCol } from '@ionic/react';
-import '../../styles/app_features.css';
+import '../../styles/app-features.css';
 
 export function AppFeatures() {
   return (
