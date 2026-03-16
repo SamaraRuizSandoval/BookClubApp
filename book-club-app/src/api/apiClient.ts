@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL:
+    'https://bookclub-backend.redwater-26f8bbd2.centralus.azurecontainerapps.io/',
   headers: {
     'Content-Type': 'application/json',
   },
