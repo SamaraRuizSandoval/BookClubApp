@@ -2,19 +2,13 @@ import { IonApp, IonSplitPane, IonRouterOutlet } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Switch, Route, Redirect } from 'react-router-dom';
 
-import { LeftMenu } from './components/LeftMenu';
 import { AdminLayout } from './components/layout/AdminLayout';
+import { UserLayout } from './components/layout/UserLayout';
 import { useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { LandingPage } from './pages/LandingPage';
 import { Login } from './pages/Login';
-import { Page } from './pages/Page';
 import { Register } from './pages/Register';
-import {
-  ReadingSection,
-  WishlistSection,
-  CompletedSection,
-} from './utils/sections';
 import './global.css';
 
 export default function App() {
@@ -24,75 +18,65 @@ export default function App() {
     return <div>Loading...</div>;
   }
 
+  function RedirectIfAuthenticated({ children }: { children: JSX.Element }) {
+    const { auth } = useAuth();
+
+    if (auth.isAuthenticated) {
+      return auth.user?.role === 'admin' ? (
+        <Redirect to="/admin" />
+      ) : (
+        <Redirect to="/home" />
+      );
+    }
+
+    return children;
+  }
+
   return (
     <IonApp>
       <IonReactRouter>
-        <IonRouterOutlet>
-          <ToastProvider>
+        <ToastProvider>
+          <IonRouterOutlet>
             <Switch>
               {/* 🏠 LANDING PAGE */}
               <Route
                 exact
                 path="/"
-                render={() =>
-                  auth.isAuthenticated ? (
-                    auth.user?.role === 'admin' ? (
-                      <Redirect to="/admin" />
-                    ) : (
-                      <Redirect to="/home" />
-                    )
-                  ) : (
+                render={() => (
+                  <RedirectIfAuthenticated>
                     <LandingPage />
-                  )
-                }
+                  </RedirectIfAuthenticated>
+                )}
               />
 
               {/* 🔓 LOGIN */}
               <Route
                 path="/login"
-                render={() =>
-                  auth.isAuthenticated ? <Redirect to="/home" /> : <Login />
-                }
+                render={() => (
+                  <RedirectIfAuthenticated>
+                    <Login />
+                  </RedirectIfAuthenticated>
+                )}
               />
 
               {/* 📝 REGISTER */}
               <Route
                 path="/register"
-                render={() =>
-                  auth.isAuthenticated ? <Redirect to="/home" /> : <Register />
-                }
+                render={() => (
+                  <RedirectIfAuthenticated>
+                    <Register />
+                  </RedirectIfAuthenticated>
+                )}
               />
 
               {/* 🔐 ADMIN */}
               <Route path="/admin" component={AdminLayout} />
 
               {/* 🔐 AUTHENTICATED USER AREA */}
-              <Route>
-                <IonSplitPane when="md" contentId="main-content">
-                  <LeftMenu />
-                  <IonRouterOutlet id="main-content">
-                    <Switch>
-                      <Route
-                        path="/home"
-                        component={() => <Page title="Home" />}
-                      />
-                      <Route path="/reading" component={ReadingSection} />
-                      <Route path="/wishlist" component={WishlistSection} />
-                      <Route path="/completed" component={CompletedSection} />
-                      <Route
-                        path="/settings"
-                        component={() => <Page title="Settings" />}
-                      />
-
-                      {/* fallback */}
-                      <Route component={() => <Page title="Not Found" />} />
-                    </Switch>
-                  </IonRouterOutlet>
-                </IonSplitPane>
-              </Route>
+              <Route path="/home" component={UserLayout} />
             </Switch>
-          </ToastProvider>
-        </IonRouterOutlet>
+          </IonRouterOutlet>
+        </ToastProvider>
       </IonReactRouter>
     </IonApp>
   );

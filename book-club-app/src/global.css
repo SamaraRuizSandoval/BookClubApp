@@ -15,6 +15,10 @@
   --white: #ffffff;
   --shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
   --radius: 14px;
+  --sidebar-w: 220px;
+  --reading: #6abf8a;
+  --want: #7aaee8;
+  --done: #c9a84c;
 }
 
 .midnight-bg {
@@ -39,6 +43,29 @@
   animation: twinkle var(--d, 3s) ease-in-out infinite;
 }
 
+/* Logo */
+.topbar-logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem;
+  color: var(--warm-white);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-mark {
+  width: 28px;
+  height: 28px;
+  background: var(--gold);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+/* Input for Forms */
 ion-input.custom {
   text-transform: none;
   letter-spacing: normal;
@@ -59,6 +86,7 @@ ion-input.custom {
   font-size: 0.925rem;
 }
 
+/* Primary button */
 ion-button.btn-primary {
   --background: var(--gold);
   --color: var(--navy);
