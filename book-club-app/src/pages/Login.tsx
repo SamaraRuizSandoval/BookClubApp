@@ -62,22 +62,24 @@ export function Login() {
         },
       );
 
-      const authToken = authResponse.data.auth_token.token;
+      const { token, expiry } = authResponse.data.auth_token;
 
-      localStorage.setItem('authToken', authToken);
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('authExpiry', expiry);
 
-      const userData = await api.get<User>('/me', {
+      const userResponse = await api.get<User>('/me', {
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
+      const user = userResponse.data;
 
-      login(authToken, userData);
+      login(token, expiry, userResponse.data);
       setIsLoading(false);
-      if (userData.data.role === 'admin') {
+      if (user.role === 'admin') {
         history.replace('/admin');
       } else {
-        history.replace('/home');
+        history.push('/home', { user });
       }
     } catch (error) {
       console.error('Error logging in:', error);

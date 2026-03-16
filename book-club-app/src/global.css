@@ -122,6 +122,40 @@ ion-toolbar {
   --border-bottom: 1px solid var(--navy-border);
 }
 
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--navy-light);
+  border: 1px solid var(--navy-border);
+  border-radius: 50px;
+  padding: 5px 14px 5px 5px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.user-chip:hover {
+  border-color: rgba(201, 168, 76, 0.3);
+}
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.user-name {
+  padding-left: 15px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--warm-white);
+}
+
 .success-toast {
   --background: #0f766e;
   --color: white;

@@ -1,8 +1,8 @@
 @import '../global.css';
-.sidebar {
-  width: var(--sidebar-w);
-  flex-shrink: 0;
-  --background: var(--navy-mid);
+@media (min-width: 1200px) {
+  .sidebar {
+    width: var(--sidebar-w);
+  }
 }
 
 ion-content.sidebar-content {

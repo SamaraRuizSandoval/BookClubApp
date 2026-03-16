@@ -11,15 +11,27 @@ import {
   IonMenuButton,
 } from '@ionic/react';
 import { useState } from 'react';
+import { useLocation } from 'react-router';
 
-import profilePic from '../../assets/images/person-circle.svg';
 import { useAuth } from '../../context/AuthContext';
+import { User } from '../../types/user';
+
+type UserData = {
+  user: User;
+};
 
 export function UpperNavigation() {
+  const { auth } = useAuth();
+  const user = auth.user;
   const [showOptions, setShowOptions] = useState(false);
   const [event, setEvent] = useState<any>(null);
   const { logout } = useAuth();
   const router = useIonRouter();
+  const initials = auth.user?.username
+    ?.split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase();
 
   const handleLogout = () => {
     logout();
@@ -35,15 +47,17 @@ export function UpperNavigation() {
           </IonButtons>
           <IonButtons slot="end">
             <IonButton
+              className="user-chip"
               fill="clear"
               onClick={(e) => {
                 setEvent(e.nativeEvent);
                 setShowOptions(true);
               }}
             >
-              <IonAvatar>
-                <img src={profilePic} alt="Profile" />
-              </IonAvatar>
+              <div className="user-avatar" aria-hidden="true">
+                {initials}
+              </div>
+              <span className="user-name">{user?.username}</span>
             </IonButton>
           </IonButtons>
         </IonToolbar>

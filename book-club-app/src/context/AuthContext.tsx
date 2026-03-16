@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-import { AuthState } from '../types/auth';
+import { AuthState, AuthTokenResponse } from '../types/auth';
+import { User } from '../types/user';
 
 type AuthContextType = {
   auth: AuthState;
-  login: (token: string, user: any) => void;
+  login: (token: string, expiry: string, user: User) => void;
   logout: () => void;
   initializing: boolean;
 };
@@ -25,8 +26,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // 🔄 Restore session on app load
   useEffect(() => {
     const storedToken = localStorage.getItem('authToken');
+    const storedExpiry = localStorage.getItem('authExpiry');
+    const storedUser = localStorage.getItem('user');
 
-    if (!storedToken) {
+    if (!storedToken || !storedExpiry) {
+      setInitializing(false);
+      return;
+    }
+
+    const expiryDate = new Date(storedExpiry);
+
+    if (expiryDate <= new Date()) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('authExpiry');
+      localStorage.removeItem('user');
+
       setInitializing(false);
       return;
     }
@@ -58,8 +72,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
   }, []);
 
-  const login = (token: string, user: any) => {
+  const login = (token: string, expiry: string, user: User) => {
     localStorage.setItem('authToken', token);
+    localStorage.setItem('authExpiry', expiry);
+    localStorage.setItem('user', JSON.stringify(user));
 
     setAuth({
       token,

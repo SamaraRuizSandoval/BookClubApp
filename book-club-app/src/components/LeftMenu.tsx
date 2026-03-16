@@ -52,7 +52,12 @@ export function LeftMenu() {
   };
 
   return (
-    <IonMenu contentId="main-content" type="overlay" side="start">
+    <IonMenu
+      className="sidebar"
+      contentId="main-content"
+      type="overlay"
+      side="start"
+    >
       <IonHeader>
         <IonToolbar>
           <IonTitle>
