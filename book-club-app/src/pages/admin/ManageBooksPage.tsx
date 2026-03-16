@@ -13,7 +13,7 @@ import { addOutline } from 'ionicons/icons';
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import api from '../../api/axios';
+import { api } from '../../api/apiClient';
 import { BookGrid } from '../../components/books/BooksGrid';
 import { Book, BookResponse } from '../../types/book';
 

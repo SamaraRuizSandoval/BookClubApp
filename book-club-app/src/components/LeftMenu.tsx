@@ -4,59 +4,104 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  IonList,
-  IonItem,
   IonMenuToggle,
-  IonIcon,
-  IonLabel,
 } from '@ionic/react';
-import {
-  homeOutline,
-  bookOutline,
-  heartOutline,
-  checkmarkDoneOutline,
-  settingsOutline,
-} from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
+import '../styles/left-menu.css';
+import '../global.css';
 
 const navItems = [
-  { to: '/home', icon: homeOutline, label: 'Home' },
-  { to: '/reading', icon: bookOutline, label: 'Reading' },
-  { to: '/wishlist', icon: heartOutline, label: 'Wishlist' },
-  { to: '/completed', icon: checkmarkDoneOutline, label: 'Completed' },
-  { to: '/settings', icon: settingsOutline, label: 'Settings' },
+  { to: '/home', icon: '🔍', label: 'Browse Books' },
+  { to: '/my-shelf', icon: '🏠', label: 'My Shelf' },
+];
+
+const bookCollections = [
+  {
+    to: '/reading',
+    style: { background: 'var(--reading)' },
+    label: 'Reading',
+    id: 'count-reading',
+  },
+  {
+    to: '/wishlist',
+    style: { background: 'var(--want)' },
+    label: 'Wishlist',
+    id: 'count-want',
+  },
+  {
+    to: '/completed',
+    style: { background: 'var(--done)' },
+    label: 'Completed',
+    id: 'count-done',
+  },
 ];
 
 export function LeftMenu() {
   const location = useLocation();
 
+  const renderNavItem = (to: string, icon: any, label: string) => {
+    const active = location.pathname.startsWith(to);
+    return (
+      <IonMenuToggle key={to} autoHide={false}>
+        <a className={`nav-item ${active ? 'active' : ''}`} href={to}>
+          <span className="nav-icon">{icon}</span>
+          {label}
+        </a>
+      </IonMenuToggle>
+    );
+  };
+
   return (
-    <IonMenu contentId="main-content" type="overlay" side="start">
+    <IonMenu
+      className="sidebar"
+      contentId="main-content"
+      type="overlay"
+      side="start"
+    >
       <IonHeader>
         <IonToolbar>
-          <IonTitle>BookClub</IonTitle>
+          <IonTitle>
+            <a href="/" className="topbar-logo" aria-label="BookClub home">
+              <span className="logo-mark" aria-hidden="true">
+                📚
+              </span>
+              BookClub
+            </a>
+          </IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent>
-        <IonList inset>
-          {navItems.map(({ to, icon, label }) => {
+
+      <IonContent fullscreen className="sidebar-content">
+        {/* Top nav items */}
+        <div className="sidebar-section">
+          {navItems.map(({ to, icon, label }) =>
+            renderNavItem(to, icon, label),
+          )}
+        </div>
+
+        <div className="sidebar-divider" />
+
+        {/* Book collections */}
+        <div className="sidebar-section">
+          <span className="sidebar-label">My Collections</span>
+          {bookCollections.map(({ to, style, label, id }) => {
             const active = location.pathname.startsWith(to);
             return (
               <IonMenuToggle key={to} autoHide={false}>
-                <IonItem
-                  button
-                  detail={false}
-                  color={active ? 'primary' : undefined}
-                  routerLink={to}
-                  routerDirection="root"
+                <a
+                  className={`collection-mini ${active ? 'active' : ''}`}
+                  href={to}
                 >
-                  <IonIcon slot="start" icon={icon} />
-                  <IonLabel>{label}</IonLabel>
-                </IonItem>
+                  <span className="coll-dot" style={style}></span>
+                  {label}
+                  <span className="nav-count gold" id={id}>
+                    0
+                  </span>
+                </a>
               </IonMenuToggle>
             );
           })}
-        </IonList>
+        </div>
       </IonContent>
     </IonMenu>
   );
