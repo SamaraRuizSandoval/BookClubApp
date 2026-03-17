@@ -22,6 +22,13 @@ type UserBook struct {
 	Book              *Book     `json:"book,omitempty"`
 }
 
+type UserBookStats struct {
+	Wishlist  int `json:"wishlist"`
+	Reading   int `json:"reading"`
+	Completed int `json:"completed"`
+	Total     int `json:"total"`
+}
+
 type UpdateUserBookRequest struct {
 	Status         *string    `json:"status"`
 	PagesRead      *int       `json:"pages_read"`
@@ -47,6 +54,7 @@ func NewUserBooksStore(db *sql.DB) *PostgresUserBooksStore {
 
 type UserBooksStore interface {
 	GetUserBooksByUserID(userID int64, status *string, page, limit int) ([]*BasicUserBook, error)
+	GetUserBookStatsByUserID(userID int64) (*UserBookStats, error)
 	AddUserBook(userid, bookid int64, status string) (*UserBook, error)
 	UpdateUserBook(userID, userBookID int64, req UpdateUserBookRequest) (*UserBook, error)
 	DeleteUserBook(userID, userBookID int64) error
@@ -157,6 +165,33 @@ func (pub *PostgresUserBooksStore) GetUserBooksByUserID(userID int64, status *st
 	}
 
 	return userBooks, nil
+}
+
+func (pub *PostgresUserBooksStore) GetUserBookStatsByUserID(userID int64) (*UserBookStats, error) {
+	query := `
+	SELECT
+		COUNT(*) FILTER (WHERE status = 'wishlist')  AS wishlist,
+		COUNT(*) FILTER (WHERE status = 'reading')   AS reading,
+		COUNT(*) FILTER (WHERE status = 'completed') AS completed,
+		COUNT(*) AS total
+	FROM user_books
+	WHERE user_id = $1
+	`
+
+	stats := &UserBookStats{}
+
+	err := pub.db.QueryRow(query, userID).Scan(
+		&stats.Wishlist,
+		&stats.Reading,
+		&stats.Completed,
+		&stats.Total,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return stats, nil
 }
 
 func (pub *PostgresUserBooksStore) AddUserBook(userid, bookid int64, status string) (*UserBook, error) {

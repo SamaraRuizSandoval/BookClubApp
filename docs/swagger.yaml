@@ -234,6 +234,17 @@ definitions:
       user_id:
         type: integer
     type: object
+  store.UserBookStats:
+    properties:
+      completed:
+        type: integer
+      reading:
+        type: integer
+      total:
+        type: integer
+      wishlist:
+        type: integer
+    type: object
   store.UserRole:
     enum:
     - user
@@ -953,6 +964,31 @@ paths:
       security:
       - BearerAuth: []
       summary: Add a book to a user's collection
+      tags:
+      - user_books
+  /users/{user_id}/books/stats:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the book collection stats for a given user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.UserBookStats'
+        "401":
+          description: 'Error: Unauthorized'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "500":
+          description: 'Error: Internal server error'
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Get a user's book stats
       tags:
       - user_books
 schemes:

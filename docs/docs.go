@@ -1068,6 +1068,46 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/users/{user_id}/books/stats": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieves the book collection stats for a given user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_books"
+                ],
+                "summary": "Get a user's book stats",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.UserBookStats"
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1421,6 +1461,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "store.UserBookStats": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "integer"
+                },
+                "reading": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "wishlist": {
                     "type": "integer"
                 }
             }
