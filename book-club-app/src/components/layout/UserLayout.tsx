@@ -9,14 +9,14 @@ import { Switch, Route } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 
 import { Page } from '../../pages/Page';
+import { DiscoverBooks } from '../../pages/user/DiscoverBooks';
 import {
   ReadingSection,
   WishlistSection,
   CompletedSection,
 } from '../../utils/sections';
 import { LeftMenu } from '../LeftMenu';
-
-import { UpperNavigation } from './UpperNavigation';
+import { UpperNavigation } from '../UpperNavigation';
 
 export function UserLayout() {
   const location = useLocation();
@@ -43,7 +43,7 @@ export function UserLayout() {
 
         <IonRouterOutlet>
           <Switch>
-            <Route exact path="/home" render={() => <Page title="Home" />} />
+            <Route path="/home" component={DiscoverBooks} />
             <Route path="/reading" component={ReadingSection} />
             <Route path="/wishlist" component={WishlistSection} />
             <Route path="/completed" component={CompletedSection} />

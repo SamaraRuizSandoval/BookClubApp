@@ -15,7 +15,7 @@
   --white: #ffffff;
   --shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
   --radius: 14px;
-  --sidebar-w: 220px;
+  --sidebar-w: 300px;
   --reading: #6abf8a;
   --want: #7aaee8;
   --done: #c9a84c;
@@ -28,6 +28,11 @@
   overflow: hidden;
 }
 
+.body-bg {
+  --background: radial-gradient(circle at top, #1b2440, #0c1224);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--warm-white);
+}
 /* Star field */
 .stars-bg {
   position: absolute;
@@ -41,6 +46,18 @@
   background: var(--warm-white);
   border-radius: 50%;
   animation: twinkle var(--d, 3s) ease-in-out infinite;
+}
+
+/* Padding  */
+.padding-top {
+  position: relative;
+  padding-top: 100px;
+}
+
+.padding-side {
+  position: relative;
+  padding-left: 6%;
+  padding-right: 6%;
 }
 
 /* Logo */
