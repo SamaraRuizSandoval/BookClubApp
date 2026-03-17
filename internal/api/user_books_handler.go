@@ -87,7 +87,6 @@ func (h *UserBooksHandler) HandleGetUserBooks(ctx *gin.Context) {
 // @Failure      500 {object} HTTPError "Error: Internal server error"
 // @Router       /users/{user_id}/books/stats [get]
 func (h *UserBooksHandler) HandleGetUserBooksStats(ctx *gin.Context) {
-
 	userValue, exists := ctx.Get("user")
 	if !exists {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "user not found"})

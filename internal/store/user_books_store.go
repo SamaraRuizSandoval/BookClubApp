@@ -186,7 +186,6 @@ func (pub *PostgresUserBooksStore) GetUserBookStatsByUserID(userID int64) (*User
 		&stats.Completed,
 		&stats.Total,
 	)
-
 	if err != nil {
 		return nil, err
 	}
