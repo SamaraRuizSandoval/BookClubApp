@@ -59,7 +59,7 @@ export function Login() {
       if (user.role === 'admin') {
         history.replace('/admin');
       } else {
-        history.push('/home', { user });
+        history.push('/app', { user });
       }
     } catch (error) {
       console.error('Error logging in:', error);

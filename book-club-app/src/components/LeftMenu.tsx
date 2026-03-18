@@ -16,8 +16,8 @@ import '../global.css';
 import { key } from 'ionicons/icons';
 
 const navItems = [
-  { to: '/home', icon: '🔍', label: 'Browse Books' },
-  { to: '/my-shelf', icon: '🏠', label: 'My Shelf' },
+  { to: '/app', icon: '🔍', label: 'Browse Books' },
+  { to: '/app/library', icon: '🏠', label: 'My Shelf' },
 ];
 
 type BookStatusKey = 'reading' | 'wishlist' | 'completed';
@@ -29,21 +29,21 @@ const bookCollections: {
   id: string;
 }[] = [
   {
-    to: '/reading',
+    to: '/app/reading',
     style: { background: 'var(--reading)' },
     label: 'Reading',
     key: 'reading',
     id: 'count-reading',
   },
   {
-    to: '/wishlist',
+    to: '/app/wishlist',
     style: { background: 'var(--want)' },
     label: 'Wishlist',
     key: 'wishlist',
     id: 'count-want',
   },
   {
-    to: '/completed',
+    to: '/app/completed',
     style: { background: 'var(--done)' },
     label: 'Completed',
     key: 'completed',

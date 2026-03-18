@@ -78,14 +78,14 @@ export function DiscoverBooks() {
               <div className="g-stat-divider"></div>
               <div className="g-stat">
                 <span className="g-stat-val" id="statWant">
-                  {stats ? stats.reading : <IonSpinner name="dots" />}
+                  {stats ? stats.wishlist : <IonSpinner name="dots" />}
                 </span>
                 <span className="g-stat-lbl">Want to Read</span>
               </div>
               <div className="g-stat-divider"></div>
               <div className="g-stat">
                 <span className="g-stat-val" id="statDone">
-                  {stats ? stats.reading : <IonSpinner name="dots" />}
+                  {stats ? stats.completed : <IonSpinner name="dots" />}
                 </span>
                 <span className="g-stat-lbl">Finished</span>
               </div>

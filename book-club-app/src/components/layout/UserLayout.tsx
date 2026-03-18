@@ -9,8 +9,10 @@ import { Switch, Route } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 
 import { UserStatsProvider } from '../../context/UserStatsContext';
+import { NotFound } from '../../pages/Not found';
 import { Page } from '../../pages/Page';
 import { DiscoverBooks } from '../../pages/user/DiscoverBooks';
+import { MyShelf } from '../../pages/user/MyShelf';
 import {
   ReadingSection,
   WishlistSection,
@@ -45,15 +47,16 @@ export function UserLayout() {
 
           <IonRouterOutlet>
             <Switch>
-              <Route path="/home" component={DiscoverBooks} />
-              <Route path="/reading" component={ReadingSection} />
-              <Route path="/wishlist" component={WishlistSection} />
-              <Route path="/completed" component={CompletedSection} />
+              <Route exact path="/app" component={DiscoverBooks} />
+              <Route path="/app/library" component={MyShelf} />
+              <Route path="/app/reading" component={ReadingSection} />
+              <Route path="/app/wishlist" component={WishlistSection} />
+              <Route path="/app/completed" component={CompletedSection} />
               <Route
-                path="/settings"
+                path="/app/settings"
                 render={() => <Page title="Settings" />}
               />
-              <Route render={() => <Page title="Not Found" />} />
+              <Route component={NotFound} />
             </Switch>
           </IonRouterOutlet>
         </IonPage>
