@@ -1,3 +1,5 @@
+import { UserBookStats } from '../types/userBooks';
+
 import { api } from './apiClient';
 
 export type BookStatus = 'wishlist' | 'reading' | 'completed';
@@ -13,6 +15,12 @@ export async function addBookToUserCollection(
       status: status,
     },
   });
+
+  return response.data;
+}
+
+export async function getUserBookStats() {
+  const response = await api.get<UserBookStats>(`/users/{user_id}/books/stats`);
 
   return response.data;
 }

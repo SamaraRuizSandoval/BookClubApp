@@ -1,19 +1,21 @@
 import { IonContent, IonSpinner } from '@ionic/react';
+import { useEffect, useState } from 'react';
 
 import { api } from '../../api/apiClient';
 import { addBookToUserCollection } from '../../api/userBooksApi';
 import { useAuth } from '../../context/AuthContext';
+import { useUserStats } from '../../context/UserStatsContext';
+
 import '../../styles/discover-books.css';
 
 import { DiscoverBooksCard } from '../../components/books/DiscoverBookCard';
-
-import { useEffect, useState } from 'react';
-
 import { Book, BookResponse } from '../../types/book';
 
 export function DiscoverBooks() {
   const { auth } = useAuth();
   const user = auth.user;
+
+  const { stats, refreshStats } = useUserStats();
 
   const [books, setBooks] = useState<Book[]>([]);
   const [loadingBooks, setLoadingBooks] = useState(true);
@@ -41,6 +43,8 @@ export function DiscoverBooks() {
     try {
       await addBookToUserCollection(user.id, bookId, status);
 
+      refreshStats(); // refresh counts
+
       console.log('Book added!');
     } catch (error) {
       console.error('Failed to add book', error);
@@ -50,11 +54,6 @@ export function DiscoverBooks() {
   return (
     <>
       <IonContent className="body-bg">
-        <style>
-          @import
-          url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
-        </style>
-
         {/* -- GREETING -- */}
         <div className="padding-top padding-side">
           <div className="greeting-hero">
@@ -72,21 +71,21 @@ export function DiscoverBooks() {
             <div className="greeting-stats" aria-label="Reading stats">
               <div className="g-stat">
                 <span className="g-stat-val" id="statReading">
-                  0
+                  {stats ? stats.reading : <IonSpinner name="dots" />}
                 </span>
                 <span className="g-stat-lbl">Reading</span>
               </div>
               <div className="g-stat-divider"></div>
               <div className="g-stat">
                 <span className="g-stat-val" id="statWant">
-                  0
+                  {stats ? stats.reading : <IonSpinner name="dots" />}
                 </span>
                 <span className="g-stat-lbl">Want to Read</span>
               </div>
               <div className="g-stat-divider"></div>
               <div className="g-stat">
                 <span className="g-stat-val" id="statDone">
-                  0
+                  {stats ? stats.reading : <IonSpinner name="dots" />}
                 </span>
                 <span className="g-stat-lbl">Finished</span>
               </div>
