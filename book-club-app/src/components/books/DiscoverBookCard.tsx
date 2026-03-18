@@ -15,7 +15,10 @@ export function DiscoverBooksCard({
   book,
   onAddToCollection,
 }: DiscoverBookCardProps) {
-  const imageUrl = book.book_images?.small_url;
+  const smallUrl = book.book_images?.small_url;
+  const mediumUrl = book.book_images?.medium_url;
+
+  const imageUrl = mediumUrl || smallUrl;
 
   return (
     <div className="book-card" role="listitem" aria-label={book.title}>

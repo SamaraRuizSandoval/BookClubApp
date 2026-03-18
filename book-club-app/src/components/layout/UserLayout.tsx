@@ -49,9 +49,12 @@ export function UserLayout() {
             <Switch>
               <Route exact path="/app" component={DiscoverBooks} />
               <Route path="/app/library" component={MyShelf} />
-              <Route path="/app/reading" component={ReadingSection} />
-              <Route path="/app/wishlist" component={WishlistSection} />
-              <Route path="/app/completed" component={CompletedSection} />
+              <Route path="/app/library/reading" component={ReadingSection} />
+              <Route path="/app/library/wishlist" component={WishlistSection} />
+              <Route
+                path="/app/library/completed"
+                component={CompletedSection}
+              />
               <Route
                 path="/app/settings"
                 render={() => <Page title="Settings" />}

@@ -29,21 +29,21 @@ const bookCollections: {
   id: string;
 }[] = [
   {
-    to: '/app/reading',
+    to: '/app/library/reading',
     style: { background: 'var(--reading)' },
     label: 'Reading',
     key: 'reading',
     id: 'count-reading',
   },
   {
-    to: '/app/wishlist',
+    to: '/app/library/wishlist',
     style: { background: 'var(--want)' },
     label: 'Wishlist',
     key: 'wishlist',
     id: 'count-want',
   },
   {
-    to: '/app/completed',
+    to: '/app/library/completed',
     style: { background: 'var(--done)' },
     label: 'Completed',
     key: 'completed',
@@ -56,7 +56,12 @@ export function LeftMenu() {
   const { stats, refreshStats } = useUserStats();
 
   const renderNavItem = (to: string, icon: any, label: string) => {
-    const active = location.pathname.startsWith(to);
+    const isExact = location.pathname === to;
+    const isNested =
+      to === '/app/library' && location.pathname.startsWith('/app/library');
+
+    const active = isExact || isNested;
+
     return (
       <IonMenuToggle key={to} autoHide={false}>
         <a className={`nav-item ${active ? 'active' : ''}`} href={to}>

@@ -129,3 +129,11 @@ ion-grid.greeting {
   opacity: 0;
   animation: fadeUp 0.5s 0.3s forwards;
 }
+
+/* ─── Responsive ─── */
+@media (max-width: 600px) {
+  .books-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
