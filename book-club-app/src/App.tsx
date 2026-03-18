@@ -8,6 +8,7 @@ import { useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { LandingPage } from './pages/LandingPage';
 import { Login } from './pages/Login';
+import { NotFound } from './pages/Not found';
 import { Register } from './pages/Register';
 import './global.css';
 
@@ -25,7 +26,7 @@ export default function App() {
       return auth.user?.role === 'admin' ? (
         <Redirect to="/admin" />
       ) : (
-        <Redirect to="/home" />
+        <Redirect to="/app" />
       );
     }
 
@@ -73,7 +74,9 @@ export default function App() {
               <Route path="/admin" component={AdminLayout} />
 
               {/* 🔐 AUTHENTICATED USER AREA */}
-              <Route path="/home" component={UserLayout} />
+              <Route path="/app" component={UserLayout} />
+
+              <Route component={NotFound} />
             </Switch>
           </IonRouterOutlet>
         </ToastProvider>

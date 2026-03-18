@@ -1,0 +1,242 @@
+/* ─── BOOK CARD ─── */
+.book-card {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.22s;
+}
+.book-card:hover {
+  transform: translateY(-5px);
+}
+.book-card:hover .cover-inner {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+}
+.book-card:hover .card-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+.book-card:hover .cover-shine {
+  opacity: 1;
+}
+
+.cover-wrap {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 2/3;
+  margin-bottom: 14px;
+}
+.cover-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 6px 10px 32px rgba(0, 0, 0, 0.45);
+  transition: box-shadow 0.22s;
+  position: relative;
+}
+/* Spine shadow */
+.cover-inner::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.35), transparent);
+  z-index: 1;
+  border-radius: 8px 0 0 8px;
+}
+.cover-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+
+.book-card:hover .cover-inner img {
+  transform: scale(1.05);
+  filter: blur(3px) brightness(0.6);
+}
+
+/* Shine overlay on hover */
+.cover-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 50%
+  );
+  opacity: 0;
+  transition: opacity 0.22s;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* No cover */
+.cover-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    160deg,
+    var(--navy-light) 0%,
+    var(--navy-mid) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  text-align: center;
+}
+.cover-placeholder .ph-icon {
+  font-size: 2rem;
+  opacity: 0.25;
+}
+.cover-placeholder .ph-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 0.85rem;
+  color: var(--silver-dim);
+  line-height: 1.3;
+  opacity: 0.7;
+}
+
+/* Collection status badge */
+.status-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 50px;
+  padding: 3px 9px;
+  border: 1px solid;
+  backdrop-filter: blur(8px);
+}
+.status-badge.reading {
+  background: rgba(106, 191, 138, 0.15);
+  color: var(--reading);
+  border-color: rgba(106, 191, 138, 0.3);
+}
+.status-badge.want {
+  background: rgba(122, 174, 232, 0.15);
+  color: var(--want);
+  border-color: rgba(122, 174, 232, 0.3);
+}
+.status-badge.done {
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--done);
+  border-color: rgba(201, 168, 76, 0.3);
+}
+
+/* Progress bar (for reading) */
+.progress-bar-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--reading);
+  border-radius: 0 2px 0 0;
+  transition: width 0.4s ease;
+}
+
+/* Hover action overlay */
+.card-actions {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  transition: opacity 0.25s ease;
+
+  backdrop-filter: blur(4px);
+  background: rgba(10, 18, 32, 0.7);
+}
+.action-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 75%;
+}
+.btn-collection {
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+.btn-collection.reading {
+  background: rgba(106, 191, 138, 0.12);
+  color: var(--reading);
+  border-color: rgba(106, 191, 138, 0.3);
+}
+.btn-collection.reading:hover {
+  background: var(--reading);
+  color: var(--navy);
+  border-color: var(--reading);
+}
+.btn-collection.want {
+  background: rgba(122, 174, 232, 0.12);
+  color: var(--want);
+  border-color: rgba(122, 174, 232, 0.3);
+}
+.btn-collection.want:hover {
+  background: var(--want);
+  color: var(--navy);
+  border-color: var(--want);
+}
+.btn-collection.done {
+  background: rgba(201, 168, 76, 0.12);
+  color: var(--done);
+  border-color: rgba(201, 168, 76, 0.3);
+}
+.btn-collection.done:hover {
+  background: var(--done);
+  color: var(--navy);
+  border-color: var(--done);
+}
+
+/* Book info below cover */
+.book-meta {
+  padding: 0 2px;
+}
+.book-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--warm-white);
+  line-height: 1.3;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.book-author {
+  font-size: 0.78rem;
+  color: var(--silver-dim);
+  font-weight: 300;
+}

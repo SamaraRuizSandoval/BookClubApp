@@ -14,6 +14,11 @@ func (mubs *MockUserBooksStore) GetUserBooksByUserID(userID int64, status *strin
 	return args.Get(0).([]*store.BasicUserBook), args.Error(1)
 }
 
+func (mubs *MockUserBooksStore) GetUserBookStatsByUserID(userID int64) (*store.UserBookStats, error) {
+	args := mubs.Called(userID)
+	return args.Get(0).(*store.UserBookStats), args.Error(1)
+}
+
 func (mubs *MockUserBooksStore) AddUserBook(userID, bookID int64, status string) (*store.UserBook, error) {
 	args := mubs.Called(userID, bookID, status)
 	return args.Get(0).(*store.UserBook), args.Error(1)

@@ -75,6 +75,40 @@ func (h *UserBooksHandler) HandleGetUserBooks(ctx *gin.Context) {
 	})
 }
 
+// HandleGetUserBooksStats godoc
+// @Summary      Get a user's book stats
+// @Description  Retrieves the book collection stats for a given user.
+// @Tags         user_books
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {object} store.UserBookStats
+// @Failure      401 {object} HTTPError "Error: Unauthorized"
+// @Failure      500 {object} HTTPError "Error: Internal server error"
+// @Router       /users/{user_id}/books/stats [get]
+func (h *UserBooksHandler) HandleGetUserBooksStats(ctx *gin.Context) {
+	userValue, exists := ctx.Get("user")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "user not found"})
+		return
+	}
+
+	user, ok := userValue.(*store.User)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "invalid user type"})
+		return
+	}
+
+	stats, err := h.userBooksStore.GetUserBookStatsByUserID(user.ID)
+	if err != nil {
+		h.logger.Printf("ERROR: GetUserBookStatsByUserID: %v", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, stats)
+}
+
 // HandleAddUserBook godoc
 // @Summary      Add a book to a user's collection
 // @Description  Adds a book to a user's collection with a specified status.

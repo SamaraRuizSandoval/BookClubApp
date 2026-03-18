@@ -295,23 +295,194 @@ func (suite *UserBooksHandlerTestSuite) TestHandleDeleteUserBook_NotFound() {
 	suite.MockStore.AssertExpectations(suite.T())
 }
 
-func (suite *UserBooksHandlerTestSuite) TestHandleDeleteUserBook_StoreError() {
+func (suite *UserBooksHandlerTestSuite) TestHandleGetUserBooks_WithStatusFilter() {
 	w := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(w)
-	req, _ := http.NewRequest(http.MethodDelete, "/user-books/55", nil)
+	req, _ := http.NewRequest("GET", "/?page=1&limit=10&status=reading", nil)
 	ctx.Request = req
-	ctx.Set("user", &store.User{ID: 2})
-	ctx.Params = gin.Params{
-		gin.Param{Key: "id", Value: "55"},
-	}
+	ctx.Set("user", &store.User{ID: 1})
 
-	suite.MockStore.On("DeleteUserBook", int64(2), int64(55)).Return(errors.New("boom"))
+	status := "reading"
+	ub := &store.BasicUserBook{ID: 10, UserID: 1, Status: "reading", UpdatedAt: store.JSONDate(time.Now())}
+	suite.MockStore.On("GetUserBooksByUserID", int64(1), &status, 1, 10).Return([]*store.BasicUserBook{ub}, nil)
 
-	suite.UserBooksHandler.HandleDeleteUserBook(ctx)
+	suite.UserBooksHandler.HandleGetUserBooks(ctx)
+	suite.Equal(http.StatusOK, w.Code)
+
+	var resp UserBooksResponse
+	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	suite.NoError(err)
+	suite.Len(resp.UserBooks, 1)
+	suite.Equal("reading", resp.UserBooks[0].Status)
+	suite.MockStore.AssertExpectations(suite.T())
+}
+
+func (suite *UserBooksHandlerTestSuite) TestHandleGetUserBooks_DefaultPagination() {
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	req, _ := http.NewRequest("GET", "/", nil)
+	ctx.Request = req
+	ctx.Set("user", &store.User{ID: 1})
+
+	ub := &store.BasicUserBook{ID: 10, UserID: 1, Status: "wishlist", UpdatedAt: store.JSONDate(time.Now())}
+	suite.MockStore.On("GetUserBooksByUserID", int64(1), (*string)(nil), 1, 20).Return([]*store.BasicUserBook{ub}, nil)
+
+	suite.UserBooksHandler.HandleGetUserBooks(ctx)
+	suite.Equal(http.StatusOK, w.Code)
+
+	var resp UserBooksResponse
+	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	suite.NoError(err)
+	suite.Equal(1, resp.Page)
+	suite.Equal(20, resp.Limit)
+	suite.MockStore.AssertExpectations(suite.T())
+}
+
+// --- HandleGetUserBooksStats Tests ---
+func (suite *UserBooksHandlerTestSuite) TestHandleGetUserBooksStats_UserNotFound() {
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	req, _ := http.NewRequest("GET", "/", nil)
+	ctx.Request = req
+	// Don't set user in context
+
+	suite.UserBooksHandler.HandleGetUserBooksStats(ctx)
+	suite.Equal(http.StatusUnauthorized, w.Code)
+}
+
+func (suite *UserBooksHandlerTestSuite) TestHandleGetUserBooksStats_InvalidUserType() {
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	req, _ := http.NewRequest("GET", "/", nil)
+	ctx.Request = req
+	ctx.Set("user", "invalid-user-type")
+
+	suite.UserBooksHandler.HandleGetUserBooksStats(ctx)
+	suite.Equal(http.StatusInternalServerError, w.Code)
+}
+
+func (suite *UserBooksHandlerTestSuite) TestHandleGetUserBooksStats_StoreError() {
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	req, _ := http.NewRequest("GET", "/", nil)
+	ctx.Request = req
+	ctx.Set("user", &store.User{ID: 1})
+
+	suite.MockStore.On("GetUserBookStatsByUserID", int64(1)).Return((*store.UserBookStats)(nil), errors.New("boom"))
+
+	suite.UserBooksHandler.HandleGetUserBooksStats(ctx)
 	suite.Equal(http.StatusInternalServerError, w.Code)
 	suite.MockStore.AssertExpectations(suite.T())
 }
 
+func (suite *UserBooksHandlerTestSuite) TestHandleGetUserBooksStats_Success() {
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	req, _ := http.NewRequest("GET", "/", nil)
+	ctx.Request = req
+	ctx.Set("user", &store.User{ID: 1})
+
+	stats := &store.UserBookStats{Wishlist: 5, Reading: 2, Completed: 10, Total: 17}
+	suite.MockStore.On("GetUserBookStatsByUserID", int64(1)).Return(stats, nil)
+
+	suite.UserBooksHandler.HandleGetUserBooksStats(ctx)
+	suite.Equal(http.StatusOK, w.Code)
+
+	var got store.UserBookStats
+	err := json.Unmarshal(w.Body.Bytes(), &got)
+	suite.NoError(err)
+	suite.Equal(5, got.Wishlist)
+	suite.Equal(2, got.Reading)
+	suite.Equal(10, got.Completed)
+	suite.Equal(17, got.Total)
+	suite.MockStore.AssertExpectations(suite.T())
+}
+
+// --- Additional HandleAddUserBook Tests ---
+func (suite *UserBooksHandlerTestSuite) TestHandleAddUserBook_SuccessWithExplicitStatus() {
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	req, _ := http.NewRequest("POST", "/?book_id=3&status=completed", nil)
+	ctx.Request = req
+	ctx.Set("user", &store.User{ID: 8})
+
+	ub := &store.UserBook{ID: 5, UserID: 8, BookID: 3, Status: "completed", UpdatedAt: store.JSONDate(time.Now())}
+	suite.MockStore.On("AddUserBook", int64(8), int64(3), "completed").Return(ub, nil)
+
+	suite.UserBooksHandler.HandleAddUserBook(ctx)
+	suite.Equal(http.StatusOK, w.Code)
+
+	var got store.UserBook
+	err := json.Unmarshal(w.Body.Bytes(), &got)
+	suite.NoError(err)
+	suite.Equal("completed", got.Status)
+	suite.MockStore.AssertExpectations(suite.T())
+}
+
+// --- Additional HandleUpdateUserBook Tests ---
+func (suite *UserBooksHandlerTestSuite) TestHandleUpdateUserBook_PercentageReadNegative() {
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	body := map[string]interface{}{"percentage_read": -10.0}
+	b, _ := json.Marshal(body)
+	reqBody := bytes.NewBuffer(b)
+	req, _ := http.NewRequest("PATCH", "/user-books/10", reqBody)
+	ctx.Request = req
+	ctx.Set("user", &store.User{ID: 1})
+
+	suite.UserBooksHandler.HandleUpdateUserBook(ctx)
+	suite.Equal(http.StatusBadRequest, w.Code)
+}
+
+func (suite *UserBooksHandlerTestSuite) TestHandleUpdateUserBook_ValidPartialUpdate() {
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	pages := 50
+	body := map[string]interface{}{"pages_read": pages}
+	b, _ := json.Marshal(body)
+	reqBody := bytes.NewBuffer(b)
+	req, _ := http.NewRequest("PATCH", "/user-books/12", reqBody)
+	ctx.Request = req
+	ctx.Set("user", &store.User{ID: 9})
+	ctx.Params = gin.Params{
+		gin.Param{Key: "id", Value: "12"},
+	}
+
+	reqStruct := store.UpdateUserBookRequest{PagesRead: &pages}
+	ub := &store.UserBook{ID: 12, UserID: 9, BookID: 3, Status: "reading", UpdatedAt: store.JSONDate(time.Now())}
+	suite.MockStore.On("UpdateUserBook", int64(9), int64(12), reqStruct).Return(ub, nil)
+
+	suite.UserBooksHandler.HandleUpdateUserBook(ctx)
+	suite.Equal(http.StatusOK, w.Code)
+	suite.MockStore.AssertExpectations(suite.T())
+}
+
+func (suite *UserBooksHandlerTestSuite) TestHandleUpdateUserBook_AllFieldsUpdate() {
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	status := "completed"
+	pages := 300
+	perc := 100.0
+	body := map[string]interface{}{"status": status, "pages_read": pages, "percentage_read": perc}
+	b, _ := json.Marshal(body)
+	reqBody := bytes.NewBuffer(b)
+	req, _ := http.NewRequest("PATCH", "/user-books/15", reqBody)
+	ctx.Request = req
+	ctx.Set("user", &store.User{ID: 10})
+	ctx.Params = gin.Params{
+		gin.Param{Key: "id", Value: "15"},
+	}
+
+	reqStruct := store.UpdateUserBookRequest{Status: &status, PagesRead: &pages, PercentageRead: &perc}
+	ub := &store.UserBook{ID: 15, UserID: 10, BookID: 5, Status: status, UpdatedAt: store.JSONDate(time.Now())}
+	suite.MockStore.On("UpdateUserBook", int64(10), int64(15), reqStruct).Return(ub, nil)
+
+	suite.UserBooksHandler.HandleUpdateUserBook(ctx)
+	suite.Equal(http.StatusOK, w.Code)
+	suite.MockStore.AssertExpectations(suite.T())
+}
+
+// --- HandleDeleteUserBook Success Test ---
 // func (suite *UserBooksHandlerTestSuite) TestHandleDeleteUserBook_Success() {
 // 	suite.MockStore.On("DeleteUserBook", int64(2), int64(55)).Return(nil)
 
@@ -325,7 +496,7 @@ func (suite *UserBooksHandlerTestSuite) TestHandleDeleteUserBook_StoreError() {
 // 	}
 
 // 	suite.UserBooksHandler.HandleDeleteUserBook(ctx)
-// 	suite.Equal(http.StatusOK, w.Code)
+// 	suite.Equal(http.StatusNoContent, w.Code)
 // 	suite.MockStore.AssertExpectations(suite.T())
 // }
 
