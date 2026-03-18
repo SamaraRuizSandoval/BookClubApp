@@ -1,36 +1,43 @@
-import { IonToast } from '@ionic/react';
+import '../styles/toast.css';
 import { createContext, useContext, useState, ReactNode } from 'react';
+
+type Toast = {
+  id: number;
+  message: string;
+  color: 'success' | 'danger' | 'primary';
+};
+
 type ToastContextType = {
-  show: (message: string, color?: 'success' | 'danger' | 'primary') => void;
+  show: (message: string, color?: Toast['color']) => void;
 };
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState('');
-  const [color, setColor] = useState<'success' | 'danger' | 'primary'>(
-    'success',
-  );
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const show = (msg: string, c: typeof color = 'success') => {
-    setMessage(msg);
-    setColor(c);
-    setIsOpen(true);
+  const show = (msg: string, color: Toast['color'] = 'success') => {
+    const id = Date.now();
+
+    setToasts((prev) => [...prev, { id, message: msg, color }]);
+
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3000);
   };
 
   return (
     <ToastContext.Provider value={{ show }}>
       {children}
-      <IonToast
-        isOpen={isOpen}
-        message={message}
-        color={color}
-        duration={3000}
-        onDidDismiss={() => setIsOpen(false)}
-        position="top"
-        className="success-toast"
-      />
+
+      <div className="toast-container">
+        {toasts.map((toast) => (
+          <div key={toast.id} className="toast">
+            <span className={`toast-dot ${toast.color}`} />
+            {toast.message}
+          </div>
+        ))}
+      </div>
     </ToastContext.Provider>
   );
 }

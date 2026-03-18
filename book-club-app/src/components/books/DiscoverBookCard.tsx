@@ -1,5 +1,7 @@
 import { IonImg } from '@ionic/react';
 
+import { useToast } from '../../context/ToastContext';
+
 import '../../styles/discover-book-card.css';
 import { Book } from '../../types/book';
 
@@ -17,6 +19,7 @@ export function DiscoverBooksCard({
 }: DiscoverBookCardProps) {
   const smallUrl = book.book_images?.small_url;
   const mediumUrl = book.book_images?.medium_url;
+  const { show } = useToast();
 
   const imageUrl = mediumUrl || smallUrl;
 
@@ -43,19 +46,28 @@ export function DiscoverBooksCard({
           <div className="action-row">
             <button
               className="btn-collection reading"
-              onClick={() => onAddToCollection(book.id, 'reading')}
+              onClick={() => {
+                onAddToCollection(book.id, 'reading');
+                show(`"${book.title}"📖 Added to Reading`, 'primary');
+              }}
             >
               📖 Reading
             </button>
             <button
               className="btn-collection want"
-              onClick={() => onAddToCollection(book.id, 'wishlist')}
+              onClick={() => {
+                onAddToCollection(book.id, 'wishlist');
+                show(`"${book.title}"🔖 Added to Want to Read`, 'primary');
+              }}
             >
               🔖 Want
             </button>
             <button
               className="btn-collection done"
-              onClick={() => onAddToCollection(book.id, 'completed')}
+              onClick={() => {
+                onAddToCollection(book.id, 'completed');
+                show(`"${book.title}"✓ Marked as Read`, 'primary');
+              }}
             >
               ✓ Done
             </button>
