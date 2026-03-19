@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -38,6 +39,7 @@ import (
 // @externalDocs.url          https://swagger.io/resources/open-api/
 
 func main() {
+	log.Println("MAIN STARTED")
 	var port int
 
 	flag.IntVar(&port, "port", 5000, "go backend server port")
@@ -69,9 +71,14 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
+	app.Logger.Println("About to start server...")
+
 	app.Logger.Printf("Running backend server on port %d\n", port)
 
 	err = server.ListenAndServe()
+	if err != nil {
+		app.Logger.Printf("Server error (non-fatal): %v", err)
+	}
 	if err != nil {
 		app.Logger.Fatalf("server error: %v", err)
 	}
